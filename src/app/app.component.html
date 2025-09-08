@@ -1,20 +1,45 @@
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
-<!-- * * * * * * * to get started with your project! * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<main class="board-container">
+  <h1>{{ title }}</h1>
+  <div class="board">
+    <div class="board-row">
+      <div class="row-header">Order Placed</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('orderPlaced'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
 
-<style>
-  :host {
-    --bright-blue: oklch(51.01% 0.274 263.83);
-    --electric-violet: oklch(53.18% 0.28 296.97);
-    --french-violet: oklch(47.66% 0.246 305.88);
-    --vivid-pink: oklch(69.02% 0.277 332.77);
-    --hot-red: oklch(61.42% 0.238 15.34);
-    --orange-red: oklch(63.32% 0.24 31.68);
+    <div class="board-row">
+      <div class="row-header">Waiting for CK</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('waitingCK'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="board-row">
+      <div class="row-header">Waiting for SJ</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('waitingSJ'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="board-row">
+      <div class="row-header">Enroute</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('enroute'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
+  </div>
+</main>
+
+<router-outlet />
 
     --gray-900: oklch(19.37% 0.006 300.98);
     --gray-700: oklch(36.98% 0.014 302.71);
@@ -177,14 +202,48 @@
   }
 </style>
 
-<main class="main">
-  <div class="content">
-    <div class="left-side">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 982 239"
-        fill="none"
-        class="angular-logo"
+<main class="board-container">
+  <h1>{{ title }}</h1>
+  <div class="board">
+    <div class="board-row">
+      <div class="row-header">Order Placed</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('orderPlaced'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="board-row">
+      <div class="row-header">Waiting for CK</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('waitingCK'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="board-row">
+      <div class="row-header">Waiting for SJ</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('waitingSJ'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="board-row">
+      <div class="row-header">Enroute</div>
+      <div class="row-content">
+        @for (order of getOrdersByStatus('enroute'); track order.id) {
+          <div class="order-circle">{{ order.id }}</div>
+        }
+      </div>
+    </div>
+  </div>
+</main>
+
+<router-outlet />
       >
         <g clip-path="url(#a)">
           <path
