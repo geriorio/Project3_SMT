@@ -494,28 +494,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.orders = response.Result.Results;
           
           // Tambahkan dummy data untuk testing
-          // const dummyOrder: ApiOrderItem = {
-          //   OrderNum: 123456,
-          //   CustomerID: "123456",
-          //   Name: "Ini Dummy",
-          //   CreateDate: "2025-09-08T15:20:00.000",
-          //   OrderDate: "2025-09-03T00:00:00",
-          //   NeedByDate: "2025-09-03T00:00:00",
-          //   Status: "Credit Review"
-          // };
+          const dummyOrder: ApiOrderItem = {
+            OrderNum: 123456,
+            CustomerID: "123456",
+            Name: "Ini Dummy",
+            CreateDate: "2025-09-08T15:20:00.000",
+            OrderDate: "2025-09-03T00:00:00",
+            NeedByDate: "2025-09-03T00:00:00",
+            Status: "Credit Review"
+          };
           
-          // const dummyOrder2: ApiOrderItem = {
-          //   OrderNum: 567890,
-          //   CustomerID: "567890",
-          //   Name: "Ini Cuma Dummy",
-          //   CreateDate: "2025-09-07T02:20:00.000",
-          //   OrderDate: "2025-09-03T00:00:00",
-          //   NeedByDate: "2025-09-03T00:00:00",
-          //   Status: "Dispatched for Delivery"
-          // };
+          const dummyOrder2: ApiOrderItem = {
+            OrderNum: 567890,
+            CustomerID: "567890",
+            Name: "Ini Cuma Dummy",
+            CreateDate: "2025-09-07T02:20:00.000",
+            OrderDate: "2025-09-03T00:00:00",
+            NeedByDate: "2025-09-03T00:00:00",
+            Status: "Dispatched for Delivery"
+          };
           
-          // this.orders.push(dummyOrder);
-          // this.orders.push(dummyOrder2);
+          this.orders.push(dummyOrder);
+          this.orders.push(dummyOrder2);
           this.error = '';
         } else {
           this.error = 'No data received from API';
@@ -591,8 +591,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const secondsStr = seconds.toString().padStart(2, '0');
     
     if (diffMs <= 0) {
-      // Format overdue: OVERDUE (sedang) dan timer (sedang)
-      return `OVERDUE\n${daysStr}:${hoursStr}:${minutesStr}:${secondsStr}`;
+      // Format overdue: hanya timer tanpa kata OVERDUE
+      return `${daysStr}:${hoursStr}:${minutesStr}:${secondsStr}`;
     } else {
       // Format normal: timer (sedang)
       return `${daysStr}:${hoursStr}:${minutesStr}:${secondsStr}`;
