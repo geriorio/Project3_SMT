@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { AuthService, User } from '../services/auth.service';
 import { Router } from '@angular/router';
@@ -25,7 +26,7 @@ interface ApiOrderItem {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   template: `
     <div class="dashboard-container">
       <!-- Header with user info -->
@@ -38,9 +39,21 @@ interface ApiOrderItem {
               LIVE {{ currentTime | date:'HH:mm:ss' }}
             </div>
           </div>
-          <div class="user-info">
-            <img [src]="currentUser?.picture" [alt]="currentUser?.name" class="user-avatar">
-            <span class="user-name">{{ currentUser?.name }}</span>
+          <div class="header-right">
+            <div class="filter-section">
+              <label for="filter-select" class="filter-label">Filter by:</label>
+              <select 
+                id="filter-select"
+                [(ngModel)]="selectedFilter" 
+                class="filter-dropdown">
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="3months">3 Months</option>
+                <option value="6months">6 Months</option>
+                <option value="year">1 Year</option>
+              </select>
+            </div>
             <button (click)="logout()" class="logout-btn">Logout</button>
           </div>
         </div>
@@ -165,6 +178,43 @@ interface ApiOrderItem {
       gap: 0.5rem;
     }
 
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+
+    .filter-dropdown {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #dee2e6;
+      padding: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      min-width: 120px;
+    }
+
+    .filter-dropdown:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
     .dashboard-header h1 {
       color: #333;
       margin: 0;
@@ -191,23 +241,6 @@ interface ApiOrderItem {
     @keyframes blink {
       0%, 50% { opacity: 1; }
       51%, 100% { opacity: 0.3; }
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-    }
-
-    .user-name {
-      font-weight: 500;
-      color: #333;
     }
 
     .logout-btn {
@@ -366,6 +399,17 @@ interface ApiOrderItem {
         gap: 1rem;
       }
 
+      .header-right {
+        order: 2;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .filter-dropdown {
+        min-width: 100px;
+        font-size: 0.8rem;
+      }
+
       .order-rectangle {
         width: 140px;
         height: 60px;
@@ -392,6 +436,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   private countdownInterval: any;
   currentTime = new Date();
+  selectedFilter = 'today'; // Default filter
 
   constructor(
     private http: HttpClient,
@@ -437,28 +482,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.orders = response.Result.Results;
           
           // Tambahkan dummy data untuk testing
-          const dummyOrder: ApiOrderItem = {
-            OrderNum: 123456,
-            CustomerID: "123456",
-            Name: "Ini Dummy",
-            CreateDate: "2025-09-08T15:20:00.000",
-            OrderDate: "2025-09-03T00:00:00",
-            NeedByDate: "2025-09-03T00:00:00",
-            Status: "Credit Review"
-          };
+          // const dummyOrder: ApiOrderItem = {
+          //   OrderNum: 123456,
+          //   CustomerID: "123456",
+          //   Name: "Ini Dummy",
+          //   CreateDate: "2025-09-08T15:20:00.000",
+          //   OrderDate: "2025-09-03T00:00:00",
+          //   NeedByDate: "2025-09-03T00:00:00",
+          //   Status: "Credit Review"
+          // };
           
-          const dummyOrder2: ApiOrderItem = {
-            OrderNum: 567890,
-            CustomerID: "567890",
-            Name: "Ini Cuma Dummy",
-            CreateDate: "2025-09-07T02:20:00.000",
-            OrderDate: "2025-09-03T00:00:00",
-            NeedByDate: "2025-09-03T00:00:00",
-            Status: "Dispatched for Delivery"
-          };
+          // const dummyOrder2: ApiOrderItem = {
+          //   OrderNum: 567890,
+          //   CustomerID: "567890",
+          //   Name: "Ini Cuma Dummy",
+          //   CreateDate: "2025-09-07T02:20:00.000",
+          //   OrderDate: "2025-09-03T00:00:00",
+          //   NeedByDate: "2025-09-03T00:00:00",
+          //   Status: "Dispatched for Delivery"
+          // };
           
-          this.orders.push(dummyOrder);
-          this.orders.push(dummyOrder2);
+          // this.orders.push(dummyOrder);
+          // this.orders.push(dummyOrder2);
           this.error = '';
         } else {
           this.error = 'No data received from API';
@@ -474,10 +519,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getLatestOrdersByStatus(status: string, limit: number): ApiOrderItem[] {
-    // Tampilkan order 673515 (data asli) + 2 dummy orders (123456, 567890)
+    // Tampilkan semua data asli dengan filter tanggal
     return this.orders
-      .filter(order => order.Status === status && 
-        (order.OrderNum === 673515 || order.OrderNum === 123456 || order.OrderNum === 567890))
+      .filter(order => order.Status === status && this.isWithinDateFilter(order))
       .sort((a, b) => new Date(b.CreateDate || '').getTime() - new Date(a.CreateDate || '').getTime())
       .slice(0, limit);
   }
@@ -525,6 +569,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return 'color-yellow'; // >0 <=12 jam - kuning
     } else {
       return 'color-red'; // <=0 jam - merah
+    }
+  }
+
+  setFilter(filter: string) {
+    this.selectedFilter = filter;
+  }
+
+  isWithinDateFilter(order: ApiOrderItem): boolean {
+    if (!order.CreateDate) return false;
+    
+    const createDate = new Date(order.CreateDate);
+    const now = new Date();
+    
+    switch (this.selectedFilter) {
+      case 'today':
+        return createDate.toDateString() === now.toDateString();
+      case 'week':
+        const weekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+        return createDate >= weekAgo;
+      case 'month':
+        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        return createDate >= monthAgo;
+      case '3months':
+        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+        return createDate >= threeMonthsAgo;
+      case '6months':
+        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+        return createDate >= sixMonthsAgo;
+      case 'year':
+        const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+        return createDate >= yearAgo;
+      default:
+        return true;
     }
   }
 
