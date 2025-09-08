@@ -69,7 +69,10 @@ interface ApiOrderItem {
           <div class="board">
             <!-- Order Placed -->
             <div class="board-row">
-              <div class="row-header">Order Placed</div>
+              <div class="row-header clickable" (click)="openStatusDetail('Order Placed')">
+                Order Placed
+                <span class="expand-icon">→</span>
+              </div>
               <div class="row-content">
                 @for (order of getLatestOrdersByStatus('Order Placed', 20); track order.OrderNum) {
                   <div class="order-rectangle" 
@@ -89,7 +92,10 @@ interface ApiOrderItem {
 
             <!-- Credit Review -->
             <div class="board-row">
-              <div class="row-header">Credit Review</div>
+              <div class="row-header clickable" (click)="openStatusDetail('Credit Review')">
+                Credit Review
+                <span class="expand-icon">→</span>
+              </div>
               <div class="row-content">
                 @for (order of getLatestOrdersByStatus('Credit Review', 20); track order.OrderNum) {
                   <div class="order-rectangle" 
@@ -109,7 +115,10 @@ interface ApiOrderItem {
 
             <!-- Delivery Planning -->
             <div class="board-row">
-              <div class="row-header">Delivery Planning</div>
+              <div class="row-header clickable" (click)="openStatusDetail('Delivery Planning')">
+                Delivery Planning
+                <span class="expand-icon">→</span>
+              </div>
               <div class="row-content">
                 @for (order of getLatestOrdersByStatus('Delivery Planning', 20); track order.OrderNum) {
                   <div class="order-rectangle" 
@@ -129,7 +138,10 @@ interface ApiOrderItem {
 
             <!-- Dispatched for Delivery -->
             <div class="board-row">
-              <div class="row-header">Dispatched for Delivery</div>
+              <div class="row-header clickable" (click)="openStatusDetail('Dispatched for Delivery')">
+                Dispatched for Delivery
+                <span class="expand-icon">→</span>
+              </div>
               <div class="row-content">
                 @for (order of getLatestOrdersByStatus('Dispatched for Delivery', 20); track order.OrderNum) {
                   <div class="order-rectangle" 
@@ -519,11 +531,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getLatestOrdersByStatus(status: string, limit: number): ApiOrderItem[] {
-    // Tampilkan semua data asli dengan filter tanggal
-    return this.orders
-      .filter(order => order.Status === status && this.isWithinDateFilter(order))
-      .sort((a, b) => new Date(b.CreateDate || '').getTime() - new Date(a.CreateDate || '').getTime())
-      .slice(0, limit);
+    // Tampilkan semua data asli dengan filter tanggal dan custom sorting
+    const filteredOrders = this.orders
+      .filter(order => order.Status === status && this.isWithinDateFilter(order));
+    
+    // Custom sorting berdasarkan color class
+    const sortedOrders = filteredOrders.sort((a, b) => {
+      const colorA = this.getColorClass(a);
+      const colorB = this.getColorClass(b);
+      const timeRemainingA = this.getTimeRemainingMs(a);
+      const timeRemainingB = this.getTimeRemainingMs(b);
+      
+      // Group by color first
+      if (colorA !== colorB) {
+        const colorOrder: { [key: string]: number } = { 'color-red': 0, 'color-yellow': 1, 'color-green': 2 };
+        return colorOrder[colorA] - colorOrder[colorB];
+      }
+      
+      // Within same color, sort by time
+      if (colorA === 'color-green' || colorA === 'color-yellow') {
+        // Hijau & Kuning: time left paling sedikit ke paling banyak
+        return timeRemainingA - timeRemainingB;
+      } else if (colorA === 'color-red') {
+        // Merah: overdue tertinggi ke terendah (most negative to least negative)
+        return timeRemainingA - timeRemainingB;
+      }
+      
+      return 0;
+    });
+    
+    return sortedOrders.slice(0, limit);
+  }
+
+  getTimeRemainingMs(order: ApiOrderItem): number {
+    if (!order.CreateDate) return 0;
+    
+    const createDate = new Date(order.CreateDate);
+    const deadline = new Date(createDate.getTime() + (48 * 60 * 60 * 1000)); // +48 jam
+    return deadline.getTime() - this.currentTime.getTime();
   }
 
   getTimeRemaining(order: ApiOrderItem): string {
@@ -603,6 +648,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       default:
         return true;
     }
+  }
+
+  openStatusDetail(status: string) {
+    // Buka halaman baru dengan query parameter untuk status
+    const url = `/dashboard/detail?status=${encodeURIComponent(status)}&filter=${this.selectedFilter}`;
+    window.open(url, '_blank');
   }
 
   logout() {
