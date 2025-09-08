@@ -50,38 +50,59 @@ declare var google: any;
     </div>
   `,
   styles: [`
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :host {
+      display: block;
+      height: 100vh;
+      overflow: hidden;
+    }
+
     .login-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
+      width: 100vw;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
     }
 
     .login-card {
       background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       text-align: center;
+      border: none;
+      outline: none;
     }
 
     .login-header h1 {
       color: #333;
       margin-bottom: 0.5rem;
-      font-size: 1.8rem;
+      font-size: 2rem;
+      font-weight: 600;
     }
 
     .login-header p {
       color: #666;
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
     }
 
     .login-content {
-      margin: 2rem 0;
+      margin: 2.5rem 0;
       display: flex;
       justify-content: center;
     }
@@ -91,19 +112,34 @@ declare var google: any;
       border: 1px solid #fcc;
       color: #c33;
       padding: 1rem;
-      border-radius: 6px;
-      margin-bottom: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
     }
 
     .restriction-note {
       font-size: 0.85rem;
       color: #888;
-      margin-top: 1.5rem;
+      margin-top: 2rem;
     }
 
     .g_id_signin {
       display: flex !important;
       justify-content: center !important;
+      border: none !important;
+      outline: none !important;
+    }
+
+    .g_id_signin > div {
+      border: none !important;
+      outline: none !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+      border-radius: 8px !important;
+    }
+
+    .g_id_signin iframe {
+      border: none !important;
+      outline: none !important;
     }
   `]
 })

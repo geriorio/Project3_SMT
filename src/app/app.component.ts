@@ -9,7 +9,14 @@ import { AuthService } from './services/auth.service';
   imports: [CommonModule, RouterOutlet],
   template: `
     <router-outlet></router-outlet>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      height: 100vh;
+      overflow: hidden;
+    }
+  `]
 })
 export class AppComponent implements OnInit {
   
