@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { AuthService, User } from '../services/auth.service';
@@ -31,7 +31,13 @@ interface ApiOrderItem {
       <!-- Header with user info -->
       <header class="dashboard-header">
         <div class="header-content">
-          <h1>Order Tracking Board</h1>
+          <div class="header-left">
+            <h1>Order Tracking Board</h1>
+            <div class="live-indicator">
+              <span class="live-dot"></span>
+              LIVE {{ currentTime | date:'HH:mm:ss' }}
+            </div>
+          </div>
           <div class="user-info">
             <img [src]="currentUser?.picture" [alt]="currentUser?.name" class="user-avatar">
             <span class="user-name">{{ currentUser?.name }}</span>
@@ -53,9 +59,16 @@ interface ApiOrderItem {
               <div class="row-header">Order Placed</div>
               <div class="row-content">
                 @for (order of getLatestOrdersByStatus('Order Placed', 20); track order.OrderNum) {
-                  <div class="order-circle status-placed" [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID">
-                    <div class="order-number">{{ order.OrderNum }}</div>
-                    <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                  <div class="order-rectangle" 
+                       [class]="getColorClass(order)" 
+                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
+                    <div class="order-content">
+                      <div class="order-number">{{ order.OrderNum }}</div>
+                      <div class="order-name">{{ order.Name }}</div>
+                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
+                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -66,9 +79,16 @@ interface ApiOrderItem {
               <div class="row-header">Credit Review</div>
               <div class="row-content">
                 @for (order of getLatestOrdersByStatus('Credit Review', 20); track order.OrderNum) {
-                  <div class="order-circle status-credit" [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID">
-                    <div class="order-number">{{ order.OrderNum }}</div>
-                    <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                  <div class="order-rectangle" 
+                       [class]="getColorClass(order)" 
+                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
+                    <div class="order-content">
+                      <div class="order-number">{{ order.OrderNum }}</div>
+                      <div class="order-name">{{ order.Name }}</div>
+                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
+                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -79,9 +99,16 @@ interface ApiOrderItem {
               <div class="row-header">Delivery Planning</div>
               <div class="row-content">
                 @for (order of getLatestOrdersByStatus('Delivery Planning', 20); track order.OrderNum) {
-                  <div class="order-circle status-planning" [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID">
-                    <div class="order-number">{{ order.OrderNum }}</div>
-                    <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                  <div class="order-rectangle" 
+                       [class]="getColorClass(order)" 
+                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
+                    <div class="order-content">
+                      <div class="order-number">{{ order.OrderNum }}</div>
+                      <div class="order-name">{{ order.Name }}</div>
+                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
+                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -91,10 +118,17 @@ interface ApiOrderItem {
             <div class="board-row">
               <div class="row-header">Dispatched for Delivery</div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Dispatched', 20); track order.OrderNum) {
-                  <div class="order-circle status-dispatched" [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID">
-                    <div class="order-number">{{ order.OrderNum }}</div>
-                    <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                @for (order of getLatestOrdersByStatus('Dispatched for Delivery', 20); track order.OrderNum) {
+                  <div class="order-rectangle" 
+                       [class]="getColorClass(order)" 
+                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
+                    <div class="order-content">
+                      <div class="order-number">{{ order.OrderNum }}</div>
+                      <div class="order-name">{{ order.Name }}</div>
+                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
+                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                      }
+                    </div>
                   </div>
                 }
               </div>
@@ -117,18 +151,46 @@ interface ApiOrderItem {
     }
 
     .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
+      width: 100%;
+      margin: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
     .dashboard-header h1 {
       color: #333;
       margin: 0;
       font-size: 1.5rem;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: #28a745;
+      font-weight: 600;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #28a745;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
     }
 
     .user-info {
@@ -163,43 +225,46 @@ interface ApiOrderItem {
     }
 
     .board-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
+      width: 100%;
+      margin: 0;
+      padding: 0.5rem;
     }
 
     .board {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 0.5rem;
     }
 
     .board-row {
       background: white;
-      border-radius: 8px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      padding: 0.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      margin: 0;
     }
 
     .row-header {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 600;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       color: #333;
-      border-bottom: 2px solid #e9ecef;
-      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 0.25rem;
     }
 
     .row-content {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.25rem;
+      padding: 0;
+      margin: 0;
     }
 
-    .order-circle {
-      width: 80px;
+    .order-rectangle {
+      width: 180px;
       height: 80px;
-      border-radius: 50%;
+      border-radius: 4px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -207,29 +272,80 @@ interface ApiOrderItem {
       color: white;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.3s ease-in-out;
       position: relative;
+      text-align: center;
+      padding: 0;
+      margin: 0;
     }
 
-    .order-circle:hover {
-      transform: scale(1.05);
+    .order-rectangle:hover {
+      transform: scale(1.02);
+    }
+
+    .order-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      padding: 0;
+      margin: 0;
     }
 
     .order-number {
-      font-size: 0.875rem;
+      font-size: 1.1rem;
       line-height: 1;
+      margin: 0;
+      font-weight: 800;
+      padding: 0;
+    }
+
+    .order-name {
+      font-size: 1rem;
+      line-height: 1;
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .time-remaining {
-      font-size: 0.625rem;
-      opacity: 0.9;
-      margin-top: 2px;
+      font-size: 0.8rem;
+      opacity: 1;
+      line-height: 1;
+      word-break: break-word;
+      text-align: center;
+      white-space: pre-line;
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
     }
+
+    /* Styling khusus untuk overdue text - DIHAPUS untuk fokus fungsionalitas */
 
     .status-placed { background: #28a745; }
     .status-credit { background: #ffc107; color: #333; }
     .status-planning { background: #17a2b8; }
     .status-dispatched { background: #6f42c1; }
+
+    /* Color coding berdasarkan CreateDate + 48 jam */
+    .color-green { 
+      background: #28a745; 
+      color: white;
+    } /* >12 jam */
+    .color-yellow { 
+      background: #ffc107; 
+      color: #333;
+    } /* >0 <=12 jam */
+    .color-red { 
+      background: #dc3545; 
+      color: white;
+    } /* <=0 jam */
 
     .loading, .error-message {
       text-align: center;
@@ -250,13 +366,17 @@ interface ApiOrderItem {
         gap: 1rem;
       }
 
-      .order-circle {
-        width: 60px;
+      .order-rectangle {
+        width: 140px;
         height: 60px;
       }
 
       .order-number {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
+      }
+
+      .order-name {
+        font-size: 0.6rem;
       }
 
       .time-remaining {
@@ -265,11 +385,13 @@ interface ApiOrderItem {
     }
   `]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   orders: ApiOrderItem[] = [];
   isLoading = true;
   error = '';
   currentUser: User | null = null;
+  private countdownInterval: any;
+  currentTime = new Date();
 
   constructor(
     private http: HttpClient,
@@ -280,6 +402,20 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
     this.fetchOrders();
+    this.startLiveCountdown();
+  }
+
+  ngOnDestroy() {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+  }
+
+  startLiveCountdown() {
+    // Update setiap 1 detik untuk live countdown
+    this.countdownInterval = setInterval(() => {
+      this.currentTime = new Date();
+    }, 1000);
   }
 
   fetchOrders() {
@@ -299,6 +435,30 @@ export class DashboardComponent implements OnInit {
       next: (response) => {
         if (response?.Result?.Results) {
           this.orders = response.Result.Results;
+          
+          // Tambahkan dummy data untuk testing
+          const dummyOrder: ApiOrderItem = {
+            OrderNum: 123456,
+            CustomerID: "123456",
+            Name: "Ini Dummy",
+            CreateDate: "2025-09-08T15:20:00.000",
+            OrderDate: "2025-09-03T00:00:00",
+            NeedByDate: "2025-09-03T00:00:00",
+            Status: "Credit Review"
+          };
+          
+          const dummyOrder2: ApiOrderItem = {
+            OrderNum: 567890,
+            CustomerID: "567890",
+            Name: "Ini Cuma Dummy",
+            CreateDate: "2025-09-07T02:20:00.000",
+            OrderDate: "2025-09-03T00:00:00",
+            NeedByDate: "2025-09-03T00:00:00",
+            Status: "Dispatched for Delivery"
+          };
+          
+          this.orders.push(dummyOrder);
+          this.orders.push(dummyOrder2);
           this.error = '';
         } else {
           this.error = 'No data received from API';
@@ -314,27 +474,57 @@ export class DashboardComponent implements OnInit {
   }
 
   getLatestOrdersByStatus(status: string, limit: number): ApiOrderItem[] {
+    // Tampilkan order 673515 (data asli) + 2 dummy orders (123456, 567890)
     return this.orders
-      .filter(order => order.Status === status)
-      .sort((a, b) => new Date(b.OrderDate).getTime() - new Date(a.OrderDate).getTime())
+      .filter(order => order.Status === status && 
+        (order.OrderNum === 673515 || order.OrderNum === 123456 || order.OrderNum === 567890))
+      .sort((a, b) => new Date(b.CreateDate || '').getTime() - new Date(a.CreateDate || '').getTime())
       .slice(0, limit);
   }
 
   getTimeRemaining(order: ApiOrderItem): string {
-    if (!order.NeedByDate) return '';
+    if (!order.CreateDate) return 'No Date';
     
-    const needBy = new Date(order.NeedByDate);
-    const now = new Date();
-    const diffMs = needBy.getTime() - now.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    // CreateDate + 48 jam
+    const createDate = new Date(order.CreateDate);
+    const deadline = new Date(createDate.getTime() + (48 * 60 * 60 * 1000)); // +48 jam
+    const diffMs = deadline.getTime() - this.currentTime.getTime();
     
-    if (diffMs < 0) {
-      return 'Overdue';
-    } else if (diffDays > 0) {
-      return `${diffDays}d ${diffHours}h`;
+    const absDiffMs = Math.abs(diffMs);
+    const days = Math.floor(absDiffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((absDiffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((absDiffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((absDiffMs % (1000 * 60)) / 1000);
+    
+    const daysStr = days.toString().padStart(2, '0');
+    const hoursStr = hours.toString().padStart(2, '0');
+    const minutesStr = minutes.toString().padStart(2, '0');
+    const secondsStr = seconds.toString().padStart(2, '0');
+    
+    if (diffMs <= 0) {
+      // Format overdue: OVERDUE (sedang) dan timer (sedang)
+      return `OVERDUE\n${daysStr}:${hoursStr}:${minutesStr}:${secondsStr}`;
     } else {
-      return `${diffHours}h`;
+      // Format normal: timer (sedang)
+      return `${daysStr}:${hoursStr}:${minutesStr}:${secondsStr}`;
+    }
+  }
+
+  getColorClass(order: ApiOrderItem): string {
+    if (!order.CreateDate) return 'color-red';
+    
+    // CreateDate + 48 jam
+    const createDate = new Date(order.CreateDate);
+    const deadline = new Date(createDate.getTime() + (48 * 60 * 60 * 1000)); // +48 jam
+    const diffMs = deadline.getTime() - this.currentTime.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+    
+    if (diffHours > 12) {
+      return 'color-green'; // >12 jam - hijau
+    } else if (diffHours > 0) {
+      return 'color-yellow'; // >0 <=12 jam - kuning
+    } else {
+      return 'color-red'; // <=0 jam - merah
     }
   }
 
