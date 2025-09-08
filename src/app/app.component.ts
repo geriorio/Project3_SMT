@@ -1,9 +1,4 @@
-import { Component, OnInit } from '@ang              @for (order of getLatestOrdersByStatus('Order Placed', 20); track order.OrderNum) {
-                <div class="order-circle status-placed" [title]="'Order: ' + order.OrderNum + '\nCustomer: ' + order.CustomerID">
-                  <div class="order-number">{{ order.OrderNum }}</div>
-                  <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
-                </div>
-              }core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 
@@ -31,7 +26,6 @@ interface ApiOrderItem {
   imports: [CommonModule, HttpClientModule],
   template: `
     <div class="board-container">
-      <h1>{{ title }}</h1>
       @if (error) {
         <div class="error-message">{{ error }}</div>
       } @else if (isLoading) {
