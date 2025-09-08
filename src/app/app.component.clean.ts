@@ -19,6 +19,11 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Always start at login page, let AuthGuard handle redirection if already logged in
+    // Check if user is logged in and redirect accordingly
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['']);
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 }
