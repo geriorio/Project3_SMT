@@ -74,7 +74,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Order Placed', 20); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Order Placed', 26); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -97,7 +97,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Credit Review', 20); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Credit Review', 26); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -120,7 +120,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Delivery Planning', 20); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Delivery Planning', 26); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -143,7 +143,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Dispatched for Delivery', 20); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Dispatched for Delivery', 26); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -166,13 +166,15 @@ interface ApiOrderItem {
   styles: [`
     .dashboard-container {
       min-height: 100vh;
+      max-height: 100vh;
       background: #f5f5f5;
+      overflow: hidden;
     }
 
     .dashboard-header {
       background: white;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 1rem 0;
+      padding: 0.5rem 0;
     }
 
     .header-content {
@@ -230,7 +232,7 @@ interface ApiOrderItem {
     .dashboard-header h1 {
       color: #333;
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.25rem;
     }
 
     .live-indicator {
@@ -272,43 +274,48 @@ interface ApiOrderItem {
     .board-container {
       width: 100%;
       margin: 0;
-      padding: 0.5rem;
+      padding: 0.25rem;
+      height: calc(100vh - 120px);
+      overflow-y: hidden;
     }
 
     .board {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.25rem;
+      height: 100%;
     }
 
     .board-row {
       background: white;
       border-radius: 4px;
-      padding: 0.5rem;
+      padding: 0.25rem;
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       margin: 0;
+      flex: 1;
+      min-height: 0;
     }
 
     .row-header {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
       color: #333;
       border-bottom: 1px solid #e9ecef;
-      padding-bottom: 0.25rem;
+      padding-bottom: 0.125rem;
     }
 
     .row-content {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.25rem;
+      gap: 0.125rem;
       padding: 0;
       margin: 0;
     }
 
     .order-rectangle {
-      width: 180px;
-      height: 80px;
+      width: 120px;
+      height: 60px;
       border-radius: 4px;
       display: flex;
       flex-direction: column;
@@ -340,7 +347,7 @@ interface ApiOrderItem {
     }
 
     .order-number {
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       line-height: 1;
       margin: 0;
       font-weight: 800;
@@ -348,7 +355,7 @@ interface ApiOrderItem {
     }
 
     .order-name {
-      font-size: 1rem;
+      font-size: 0.7rem;
       line-height: 1;
       margin: 0;
       padding: 0;
@@ -360,7 +367,7 @@ interface ApiOrderItem {
     }
 
     .time-remaining {
-      font-size: 0.8rem;
+      font-size: 0.6rem;
       opacity: 1;
       line-height: 1;
       word-break: break-word;
@@ -423,20 +430,20 @@ interface ApiOrderItem {
       }
 
       .order-rectangle {
-        width: 140px;
-        height: 60px;
+        width: 100px;
+        height: 50px;
       }
 
       .order-number {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
       }
 
       .order-name {
-        font-size: 0.6rem;
+        font-size: 0.5rem;
       }
 
       .time-remaining {
-        font-size: 0.5rem;
+        font-size: 0.4rem;
       }
     }
   `]
