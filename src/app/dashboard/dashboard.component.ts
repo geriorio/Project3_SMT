@@ -526,6 +526,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   error = '';
   currentUser: User | null = null;
   private countdownInterval: any;
+  private refreshInterval: any;
   currentTime = new Date();
   selectedFilter = 'today'; // Default filter
 
@@ -536,22 +537,62 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.currentUser = this.authService.getCurrentUser();
-    this.fetchOrders();
-    this.startLiveCountdown();
+    this.initializeComponent();
   }
 
   ngOnDestroy() {
+    this.cleanupTimers();
+  }
+
+  private initializeComponent() {
+    this.currentUser = this.authService.getCurrentUser();
+    this.fetchOrders();
+    this.startTimers();
+  }
+
+  private cleanupTimers() {
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
+    }
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = null;
     }
   }
 
-  startLiveCountdown() {
-    // Update setiap 1 detik untuk live countdown
+  private startTimers() {
+    // Clear existing timers before starting new ones
+    this.cleanupTimers();
+    
+    // Start countdown timer - updates every second
+    this.startLiveCountdown();
+    
+    // Start auto refresh timer - refreshes every 5 minutes
+    this.startAutoRefresh();
+  }
+
+  private startLiveCountdown() {
     this.countdownInterval = setInterval(() => {
       this.currentTime = new Date();
     }, 1000);
+  }
+
+  private startAutoRefresh() {
+    this.refreshInterval = setInterval(() => {
+      this.refreshData();
+    }, 300000); // 5 minutes
+  }
+
+  private refreshData() {
+    // Set loading state
+    this.isLoading = true;
+    
+    // Refresh user data and fetch new orders
+    this.currentUser = this.authService.getCurrentUser();
+    this.fetchOrders();
+    
+    // Note: No need to restart timers as they continue running
   }
 
   fetchOrders() {
@@ -592,9 +633,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
             NeedByDate: "2025-09-03T00:00:00",
             Status: "Dispatched for Delivery"
           };
+
+          const dummyOrder3: ApiOrderItem = {
+            OrderNum: 999999,
+            CustomerID: "567890",
+            Name: "Ini Cuma Dummy YA",
+            CreateDate: "2025-09-09T09:55:00.000",
+            OrderDate: "2025-09-03T00:00:00",
+            NeedByDate: "2025-09-03T00:00:00",
+            Status: "Dispatched for Delivery"
+          };
           
           this.orders.push(dummyOrder);
           this.orders.push(dummyOrder2);
+          this.orders.push(dummyOrder3);
           this.error = '';
         } else {
           this.error = 'No data received from API';
