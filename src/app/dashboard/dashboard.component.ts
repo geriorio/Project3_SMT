@@ -74,7 +74,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Order Placed', 26); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Order Placed', MAX_DISPLAY_ITEMS); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -97,7 +97,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Credit Review', 26); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Credit Review', MAX_DISPLAY_ITEMS); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -120,7 +120,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Delivery Planning', 26); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Delivery Planning', MAX_DISPLAY_ITEMS); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -143,7 +143,7 @@ interface ApiOrderItem {
                 <span class="expand-icon">→</span>
               </div>
               <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Dispatched for Delivery', 26); track order.OrderNum) {
+                @for (order of getLatestOrdersByStatus('Dispatched for Delivery', MAX_DISPLAY_ITEMS); track order.OrderNum) {
                   <div class="order-rectangle" 
                        [class]="getColorClass(order)" 
                        [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
@@ -165,16 +165,20 @@ interface ApiOrderItem {
   `,
   styles: [`
     .dashboard-container {
-      min-height: 100vh;
-      max-height: 100vh;
+      height: 100vh;
       background: #f5f5f5;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      margin: 0;
     }
 
     .dashboard-header {
       background: white;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 0.5rem 0;
+      padding: 0.25rem 0;
+      flex: 0 0 auto;
     }
 
     .header-content {
@@ -272,51 +276,121 @@ interface ApiOrderItem {
     }
 
     .board-container {
+      flex: 1;
       width: 100%;
       margin: 0;
-      padding: 0.25rem;
-      height: calc(100vh - 120px);
-      overflow-y: hidden;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .board {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: 2px;
       height: 100%;
+      overflow: hidden;
+      padding: 2px;
+      background: #e9ecef;
     }
 
     .board-row {
       background: white;
-      border-radius: 4px;
-      padding: 0.25rem;
+      padding: 0;
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       margin: 0;
-      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       min-height: 0;
+      width: 100%;
     }
 
     .row-header {
       font-size: 1rem;
       font-weight: 600;
-      margin-bottom: 0.25rem;
       color: #333;
       border-bottom: 1px solid #e9ecef;
-      padding-bottom: 0.125rem;
+      padding: 4px 8px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 0 0 auto;
     }
 
     .row-content {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.125rem;
-      padding: 0;
-      margin: 0;
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(10, minmax(145px, 1fr));
+      grid-template-rows: repeat(2, 1fr);
+      gap: 4px;
+      padding: 4px;
+      overflow: hidden;
+      min-height: 0;
+      align-items: stretch;
+      justify-content: start;
+      width: calc(100% - 16px);
+      max-width: 1500px;
+    }
+
+    /* Untuk layar 1080p */
+    @media screen and (min-width: 1920px) {
+      .row-content {
+        grid-template-columns: repeat(10, minmax(180px, 1fr));
+        max-width: 1900px;
+      }
+    }
+
+    /* Untuk layar 4K */
+    @media screen and (min-width: 3840px) {
+      .row-content {
+        grid-template-columns: repeat(10, minmax(360px, 1fr));
+        max-width: 3800px;
+        gap: 8px;
+        padding: 8px;
+      }
+
+      .order-number {
+        font-size: 1.75rem !important;
+      }
+
+      .order-name {
+        font-size: 1.5rem !important;
+      }
+
+      .time-remaining {
+        font-size: 1.4rem !important;
+      }
+    }
+
+    /* Untuk layar 8K */
+    @media screen and (min-width: 7680px) {
+      .row-content {
+        grid-template-columns: repeat(10, minmax(720px, 1fr));
+        max-width: 7600px;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .order-number {
+        font-size: 3.5rem !important;
+      }
+
+      .order-name {
+        font-size: 3rem !important;
+      }
+
+      .time-remaining {
+        font-size: 2.8rem !important;
+      }
     }
 
     .order-rectangle {
-      width: 120px;
-      height: 60px;
-      border-radius: 4px;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -324,10 +398,9 @@ interface ApiOrderItem {
       color: white;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease-in-out;
       position: relative;
       text-align: center;
-      padding: 0;
+      padding: 2px;
       margin: 0;
     }
 
@@ -338,44 +411,42 @@ interface ApiOrderItem {
     .order-content {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       height: 100%;
       width: 100%;
-      padding: 0;
-      margin: 0;
+      padding: 1px;
     }
 
     .order-number {
-      font-size: 0.9rem;
-      line-height: 1;
+      font-size: 0.875rem;
+      line-height: 1.2;
       margin: 0;
       font-weight: 800;
-      padding: 0;
+      padding: 1px;
     }
 
     .order-name {
-      font-size: 0.7rem;
-      line-height: 1;
+      font-size: 0.75rem;
+      line-height: 1.2;
       margin: 0;
-      padding: 0;
+      padding: 1px;
       font-weight: 600;
-      max-width: 100%;
+      width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-align: center;
     }
 
     .time-remaining {
-      font-size: 0.6rem;
-      opacity: 1;
-      line-height: 1;
-      word-break: break-word;
-      text-align: center;
-      white-space: pre-line;
+      font-size: 0.7rem;
+      line-height: 1.2;
       margin: 0;
-      padding: 0;
+      padding: 1px;
       font-weight: 600;
+      width: 100%;
+      text-align: center;
     }
 
     /* Styling khusus untuk overdue text - DIHAPUS untuk fokus fungsionalitas */
@@ -449,6 +520,7 @@ interface ApiOrderItem {
   `]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  readonly MAX_DISPLAY_ITEMS = 20; // Konstanta untuk jumlah maksimum item per section
   orders: ApiOrderItem[] = [];
   isLoading = true;
   error = '';
@@ -537,7 +609,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  getLatestOrdersByStatus(status: string, limit: number): ApiOrderItem[] {
+  getLatestOrdersByStatus(status: string, limit: number = 20): ApiOrderItem[] {
     // Tampilkan semua data asli dengan filter tanggal dan custom sorting
     const filteredOrders = this.orders
       .filter(order => order.Status === status && this.isWithinDateFilter(order));
