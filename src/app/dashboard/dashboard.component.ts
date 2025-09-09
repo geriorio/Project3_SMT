@@ -54,110 +54,77 @@ interface ApiOrderItem {
                 <option value="year">1 Year</option>
               </select>
             </div>
+            <div class="section-filter">
+              <label class="filter-label">Sections:</label>
+              <div class="dropdown-container">
+                <button 
+                  class="dropdown-toggle" 
+                  (click)="toggleDropdown()"
+                  type="button">
+                  Sections ({{ getVisibleSections().length }}/{{ availableSections.length }})
+                  <span class="dropdown-arrow" [class.open]="isDropdownOpen">▼</span>
+                </button>
+                <div class="dropdown-menu" [class.show]="isDropdownOpen">
+                  <label class="dropdown-item select-all-item">
+                    <input 
+                      type="checkbox" 
+                      [checked]="isAllSelected()"
+                      (change)="toggleSelectAll()">
+                    <span class="select-all-text">{{ getSelectAllText() }}</span>
+                  </label>
+                  <div class="dropdown-divider"></div>
+                  @for (section of availableSections; track section) {
+                    <label class="dropdown-item">
+                      <input 
+                        type="checkbox" 
+                        [checked]="getSectionChecked(section)"
+                        (change)="toggleSectionFilter(section)">
+                      <span>{{ section }}</span>
+                    </label>
+                  }
+                </div>
+              </div>
+            </div>
             <button (click)="logout()" class="logout-btn">Logout</button>
           </div>
         </div>
       </header>
 
       <!-- Main content -->
-      <div class="board-container">
+      <div class="board-container" (click)="closeDropdown()">
         @if (error) {
           <div class="error-message">{{ error }}</div>
         } @else if (isLoading) {
           <div class="loading">Loading orders...</div>
         } @else {
-          <div class="board">
-            <!-- Order Placed -->
-            <div class="board-row">
-              <div class="row-header clickable" (click)="openStatusDetail('Order Placed')">
-                Order Placed
-                <span class="expand-icon">→</span>
-              </div>
-              <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Order Placed', MAX_DISPLAY_ITEMS); track order.OrderNum) {
-                  <div class="order-rectangle" 
-                       [class]="getColorClass(order)" 
-                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
-                    <div class="order-content">
-                      <div class="order-number">{{ order.OrderNum }}</div>
-                      <div class="order-name">{{ order.Name }}</div>
-                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
-                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
-                      }
+          <div class="board" [style.height]="'calc(100vh - 80px)'" 
+               [ngClass]="{
+                 'three-sections': getVisibleSections().length === 3,
+                 'four-sections': getVisibleSections().length === 4
+               }">
+            @for (section of getVisibleSections(); track section) {
+              <div class="board-row" [style.height]="getSectionHeight()">
+                <div class="row-header clickable" (click)="openStatusDetail(section)">
+                  {{ section }}
+                  <span class="expand-icon">→</span>
+                </div>
+                <div class="row-content" [ngClass]="{'single-section': getVisibleSections().length === 1}">
+                  @for (order of getLatestOrdersByStatus(section); track order.OrderNum) {
+                    <div class="order-rectangle" 
+                         [class]="getColorClass(order)" 
+                         [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
+                      <div class="order-content">
+                        <div class="order-number">{{ order.OrderNum }}</div>
+                        <div class="order-name">{{ order.Name }}</div>
+                        @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
+                          <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
+                        }
+                      </div>
                     </div>
-                  </div>
-                }
+                  }
+                </div>
               </div>
-            </div>
-
-            <!-- Credit Review -->
-            <div class="board-row">
-              <div class="row-header clickable" (click)="openStatusDetail('Credit Review')">
-                Credit Review
-                <span class="expand-icon">→</span>
-              </div>
-              <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Credit Review', MAX_DISPLAY_ITEMS); track order.OrderNum) {
-                  <div class="order-rectangle" 
-                       [class]="getColorClass(order)" 
-                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
-                    <div class="order-content">
-                      <div class="order-number">{{ order.OrderNum }}</div>
-                      <div class="order-name">{{ order.Name }}</div>
-                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
-                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <!-- Delivery Planning -->
-            <div class="board-row">
-              <div class="row-header clickable" (click)="openStatusDetail('Delivery Planning')">
-                Delivery Planning
-                <span class="expand-icon">→</span>
-              </div>
-              <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Delivery Planning', MAX_DISPLAY_ITEMS); track order.OrderNum) {
-                  <div class="order-rectangle" 
-                       [class]="getColorClass(order)" 
-                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
-                    <div class="order-content">
-                      <div class="order-number">{{ order.OrderNum }}</div>
-                      <div class="order-name">{{ order.Name }}</div>
-                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
-                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <!-- Dispatched for Delivery -->
-            <div class="board-row">
-              <div class="row-header clickable" (click)="openStatusDetail('Dispatched for Delivery')">
-                Dispatched for Delivery
-                <span class="expand-icon">→</span>
-              </div>
-              <div class="row-content">
-                @for (order of getLatestOrdersByStatus('Dispatched for Delivery', MAX_DISPLAY_ITEMS); track order.OrderNum) {
-                  <div class="order-rectangle" 
-                       [class]="getColorClass(order)" 
-                       [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
-                    <div class="order-content">
-                      <div class="order-number">{{ order.OrderNum }}</div>
-                      <div class="order-name">{{ order.Name }}</div>
-                      @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
-                        <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
+            }
           </div>
         }
       </div>
@@ -233,6 +200,106 @@ interface ApiOrderItem {
       gap: 1rem;
     }
 
+    .section-filter {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    .dropdown-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-toggle {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #dee2e6;
+      padding: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      min-width: 180px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dropdown-toggle:hover {
+      background: #e2e6ea;
+    }
+
+    .dropdown-arrow {
+      transition: transform 0.2s;
+    }
+
+    .dropdown-arrow.open {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      border-bottom: 1px solid #f8f9fa;
+    }
+
+    .dropdown-item:hover {
+      background: #f8f9fa;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item input[type="checkbox"] {
+      margin: 0;
+    }
+
+    .select-all-item {
+      background: #f8f9fa;
+      font-weight: 600;
+    }
+
+    .select-all-item:hover {
+      background: #e9ecef;
+    }
+
+    .select-all-text {
+      color: #495057;
+      font-weight: 600;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: #dee2e6;
+      margin: 0.25rem 0;
+    }
+
     .dashboard-header h1 {
       color: #333;
       margin: 0;
@@ -286,8 +353,8 @@ interface ApiOrderItem {
     }
 
     .board {
-      display: grid;
-      grid-template-rows: repeat(4, 1fr);
+      display: flex;
+      flex-direction: column;
       gap: 2px;
       height: 100%;
       overflow: hidden;
@@ -323,68 +390,48 @@ interface ApiOrderItem {
     .row-content {
       flex: 1;
       display: grid;
-      grid-template-columns: repeat(10, minmax(145px, 1fr));
-      grid-template-rows: repeat(2, 1fr);
-      gap: 4px;
-      padding: 4px;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 3px;
+      padding: 6px;
       overflow: hidden;
       min-height: 0;
       align-items: stretch;
-      justify-content: start;
-      width: calc(100% - 16px);
-      max-width: 1500px;
+      justify-content: stretch;
+      width: calc(100% - 12px);
+      max-width: 100%;
     }
 
-    /* Untuk layar 1080p */
-    @media screen and (min-width: 1920px) {
-      .row-content {
-        grid-template-columns: repeat(10, minmax(180px, 1fr));
-        max-width: 1900px;
-      }
+    .row-content.single-section {
+      grid-template-rows: repeat(9, 1fr);
+      gap: 4px;
+      padding: 8px;
     }
 
-    /* Untuk layar 4K */
-    @media screen and (min-width: 3840px) {
-      .row-content {
-        grid-template-columns: repeat(10, minmax(360px, 1fr));
-        max-width: 3800px;
-        gap: 8px;
-        padding: 8px;
-      }
-
-      .order-number {
-        font-size: 1.75rem !important;
-      }
-
-      .order-name {
-        font-size: 1.5rem !important;
-      }
-
-      .time-remaining {
-        font-size: 1.4rem !important;
-      }
+    /* 2 sections selected */
+    .row-content:not(.single-section) {
+      grid-template-rows: repeat(4, 1fr);
     }
 
-    /* Untuk layar 8K */
-    @media screen and (min-width: 7680px) {
-      .row-content {
-        grid-template-columns: repeat(10, minmax(720px, 1fr));
-        max-width: 7600px;
-        gap: 16px;
-        padding: 16px;
-      }
+    /* Untuk 3 sections */
+    .three-sections .row-content {
+      grid-template-rows: repeat(3, 1fr);
+    }
 
-      .order-number {
-        font-size: 3.5rem !important;
-      }
+    /* Untuk 4 sections */
+    .four-sections .row-content {
+      grid-template-rows: repeat(2, 1fr);
+    }
 
-      .order-name {
-        font-size: 3rem !important;
-      }
-
-      .time-remaining {
-        font-size: 2.8rem !important;
-      }
+    .board-row {
+      background: white;
+      margin: 0;
+      padding: 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #dee2e6;
     }
 
     .order-rectangle {
@@ -419,7 +466,7 @@ interface ApiOrderItem {
     }
 
     .order-number {
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       line-height: 1.2;
       margin: 0;
       font-weight: 800;
@@ -447,6 +494,58 @@ interface ApiOrderItem {
       font-weight: 600;
       width: 100%;
       text-align: center;
+    }
+
+    /* CSS untuk single section - 9 baris */
+    .single-section .order-number {
+      font-size: 0.75rem;
+    }
+
+    .single-section .order-name {
+      font-size: 0.7rem;
+    }
+
+    .single-section .time-remaining {
+      font-size: 0.65rem;
+    }
+
+    /* CSS untuk 2 sections - 4 baris per section */
+    .row-content:not(.single-section) .order-number {
+      font-size: 0.85rem;
+    }
+
+    .row-content:not(.single-section) .order-name {
+      font-size: 0.8rem;
+    }
+
+    .row-content:not(.single-section) .time-remaining {
+      font-size: 0.75rem;
+    }
+
+    /* CSS untuk 3 sections - 3 baris per section */
+    .three-sections .row-content .order-number {
+      font-size: 0.9rem;
+    }
+
+    .three-sections .row-content .order-name {
+      font-size: 0.85rem;
+    }
+
+    .three-sections .row-content .time-remaining {
+      font-size: 0.8rem;
+    }
+
+    /* CSS untuk 4 sections - 2 baris per section */
+    .four-sections .row-content .order-number {
+      font-size: 1rem;
+    }
+
+    .four-sections .row-content .order-name {
+      font-size: 0.9rem;
+    }
+
+    .four-sections .row-content .time-remaining {
+      font-size: 0.85rem;
     }
 
     /* Styling khusus untuk overdue text - DIHAPUS untuk fokus fungsionalitas */
@@ -529,6 +628,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private refreshInterval: any;
   currentTime = new Date();
   selectedFilter = 'today'; // Default filter
+  
+  // Section filter properties
+  isDropdownOpen = false;
+  sectionFilters = {
+    'Order Placed': true,
+    'Credit Review': true,
+    'Delivery Planning': true,
+    'Dispatched for Delivery': true
+  };
+  
+  availableSections = [
+    'Order Placed',
+    'Credit Review', 
+    'Delivery Planning',
+    'Dispatched for Delivery'
+  ];
 
   constructor(
     private http: HttpClient,
@@ -661,7 +776,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  getLatestOrdersByStatus(status: string, limit: number = 20): ApiOrderItem[] {
+  getLatestOrdersByStatus(status: string, limit?: number): ApiOrderItem[] {
     // Tampilkan semua data asli dengan filter tanggal dan custom sorting
     const filteredOrders = this.orders
       .filter(order => order.Status === status && this.isWithinDateFilter(order));
@@ -691,7 +806,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return 0;
     });
     
-    return sortedOrders.slice(0, limit);
+    // Limit data berdasarkan jumlah section yang dipilih
+    const visibleSections = this.getVisibleSections();
+    let maxItems = 90; // default untuk 1 section (10x9)
+    
+    if (visibleSections.length === 1) {
+      maxItems = 90; // 10 kolom x 9 baris
+    } else if (visibleSections.length === 2) {
+      maxItems = 40; // 10 kolom x 4 baris
+    } else if (visibleSections.length === 3) {
+      maxItems = 30; // 10 kolom x 3 baris
+    } else if (visibleSections.length === 4) {
+      maxItems = 20; // 10 kolom x 2 baris
+    }
+    
+    return sortedOrders.slice(0, maxItems);
   }
 
   getTimeRemainingMs(order: ApiOrderItem): number {
@@ -779,6 +908,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
       default:
         return true;
     }
+  }
+
+  // Section filter methods
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  toggleSectionFilter(section: string) {
+    this.sectionFilters[section as keyof typeof this.sectionFilters] = 
+      !this.sectionFilters[section as keyof typeof this.sectionFilters];
+  }
+
+  getSectionChecked(section: string): boolean {
+    return this.sectionFilters[section as keyof typeof this.sectionFilters];
+  }
+
+  // Select All / Unselect All functionality
+  isAllSelected(): boolean {
+    return Object.values(this.sectionFilters).every(value => value);
+  }
+
+  toggleSelectAll() {
+    const allSelected = this.isAllSelected();
+    
+    // Jika semua sudah selected, unselect all
+    // Jika tidak semua selected, select all
+    Object.keys(this.sectionFilters).forEach(key => {
+      this.sectionFilters[key as keyof typeof this.sectionFilters] = !allSelected;
+    });
+  }
+
+  getSelectAllText(): string {
+    return this.isAllSelected() ? 'Unselect All' : 'Select All';
+  }
+
+  getVisibleSections(): string[] {
+    return this.availableSections.filter(section => 
+      this.sectionFilters[section as keyof typeof this.sectionFilters]
+    );
+  }
+
+  getSectionHeight(): string {
+    const visibleSections = this.getVisibleSections();
+    if (visibleSections.length === 0) return '0%';
+    return `${100 / visibleSections.length}%`;
+  }
+
+  closeDropdown() {
+    this.isDropdownOpen = false;
   }
 
   openStatusDetail(status: string) {
