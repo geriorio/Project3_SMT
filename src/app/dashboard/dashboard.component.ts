@@ -502,11 +502,12 @@ interface ApiOrderItem {
     .order-content {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       height: 100%;
       width: 100%;
       padding: 1px;
+      gap: 1px;
     }
 
     .order-number {
@@ -515,6 +516,7 @@ interface ApiOrderItem {
       margin: 0;
       font-weight: 800;
       padding: 1px;
+      text-align: center;
     }
 
     .order-name {
@@ -526,6 +528,8 @@ interface ApiOrderItem {
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
+      text-align: center;
+      text-overflow: ellipsis;
     }
 
     .scrolling-text {
@@ -1023,7 +1027,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             OrderNum: 123456,
             CustomerID: "123456",
             Name: "Ini Dummy",
-            CreateDate: "2025-09-08T15:20:00.000",
+            CreateDate: "2025-09-09T02:20:00.000",
             OrderDate: "2025-09-03T00:00:00",
             NeedByDate: "2025-09-03T00:00:00",
             Status: "Credit Review"
