@@ -54,6 +54,18 @@ interface ApiOrderItem {
                 <option value="year">1 Year</option>
               </select>
             </div>
+            
+            <!-- Search filter -->
+            <div class="search-section">
+              <label for="search-input" class="filter-label">Search:</label>
+              <input 
+                id="search-input"
+                type="text" 
+                [(ngModel)]="searchFilter" 
+                placeholder="Order Number, Customer ID"
+                class="search-input">
+            </div>
+            
             <div class="section-filter">
               <label class="filter-label">Sections:</label>
               <div class="dropdown-container">
@@ -115,7 +127,13 @@ interface ApiOrderItem {
                          [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
                       <div class="order-content">
                         <div class="order-number">{{ order.OrderNum }}</div>
-                        <div class="order-name">{{ order.Name }}</div>
+                        <div class="order-name">
+                          @if (order.Name.length > 15) {
+                            <div class="scrolling-text">{{ order.Name }}</div>
+                          } @else {
+                            <div class="static-text">{{ order.Name }}</div>
+                          }
+                        </div>
                         @if (getColorClass(order) === 'color-yellow' || getColorClass(order) === 'color-red') {
                           <div class="time-remaining">{{ getTimeRemaining(order) }}</div>
                         }
@@ -192,6 +210,32 @@ interface ApiOrderItem {
       outline: none;
       border-color: #007bff;
       box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .search-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .search-input {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #dee2e6;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      min-width: 200px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .search-input::placeholder {
+      color: #6c757d;
     }
 
     .header-right {
@@ -481,9 +525,35 @@ interface ApiOrderItem {
       font-weight: 600;
       width: 100%;
       overflow: hidden;
-      text-overflow: ellipsis;
       white-space: nowrap;
-      text-align: center;
+    }
+
+    .scrolling-text {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scrollTextCycle 12s linear infinite;
+      padding-right: 5px;
+    }
+
+    @keyframes scrollTextCycle {
+      0%, 15% {
+        transform: translateX(0%);
+      }
+      40%, 55% {
+        transform: translateX(-50%);
+      }
+      80%, 95% {
+        transform: translateX(-100%);
+      }
+      96%, 100% {
+        transform: translateX(0%);
+      }
+    }
+
+    .static-text {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .time-remaining {
@@ -502,7 +572,7 @@ interface ApiOrderItem {
     }
 
     .single-section .order-name {
-      font-size: 0.7rem;
+      font-size: 0.95rem;
     }
 
     .single-section .time-remaining {
@@ -515,7 +585,7 @@ interface ApiOrderItem {
     }
 
     .row-content:not(.single-section) .order-name {
-      font-size: 0.8rem;
+      font-size: 0.95rem;
     }
 
     .row-content:not(.single-section) .time-remaining {
@@ -528,7 +598,7 @@ interface ApiOrderItem {
     }
 
     .three-sections .row-content .order-name {
-      font-size: 0.85rem;
+      font-size: 0.75rem;
     }
 
     .three-sections .row-content .time-remaining {
@@ -541,7 +611,7 @@ interface ApiOrderItem {
     }
 
     .four-sections .row-content .order-name {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
 
     .four-sections .row-content .time-remaining {
@@ -582,38 +652,255 @@ interface ApiOrderItem {
       border-radius: 4px;
     }
 
-    @media (max-width: 768px) {
+    /* Responsive untuk Tablet - ukuran sedang */
+    @media (max-width: 1024px) and (min-width: 769px) {
       .header-content {
-        flex-direction: column;
-        gap: 1rem;
+        padding: 0 0.75rem;
       }
 
-      .header-right {
-        order: 2;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .filter-dropdown {
-        min-width: 100px;
+      .search-input {
+        min-width: 150px;
         font-size: 0.8rem;
       }
 
-      .order-rectangle {
-        width: 100px;
-        height: 50px;
+      .filter-dropdown, .dropdown-toggle {
+        min-width: 120px;
+        font-size: 0.8rem;
+      }
+
+      .row-content {
+        grid-template-columns: repeat(6, minmax(120px, 1fr)) !important;
+        grid-template-rows: repeat(3, 1fr) !important;
+        gap: 3px;
       }
 
       .order-number {
-        font-size: 0.7rem;
+        font-size: 0.8rem !important;
       }
 
       .order-name {
-        font-size: 0.5rem;
+        font-size: 0.7rem !important;
       }
 
       .time-remaining {
-        font-size: 0.4rem;
+        font-size: 0.65rem !important;
+      }
+    }
+
+    /* Responsive untuk Mobile Landscape */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .dashboard-header {
+        padding: 0.15rem 0;
+      }
+
+      .header-content {
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0 0.5rem;
+      }
+
+      .header-left h1 {
+        font-size: 1rem;
+      }
+
+      .live-indicator {
+        font-size: 0.75rem;
+      }
+
+      .search-input {
+        min-width: 120px;
+        font-size: 0.75rem;
+        padding: 0.25rem;
+      }
+
+      .filter-dropdown, .dropdown-toggle {
+        min-width: 100px;
+        font-size: 0.75rem;
+        padding: 0.25rem;
+      }
+
+      .row-content {
+        grid-template-columns: repeat(8, minmax(80px, 1fr)) !important;
+        grid-template-rows: repeat(2, 1fr) !important;
+        gap: 2px;
+        padding: 2px;
+      }
+
+      .order-rectangle {
+        min-height: 45px;
+      }
+
+      .order-number {
+        font-size: 0.7rem !important;
+      }
+
+      .order-name {
+        font-size: 0.6rem !important;
+      }
+
+      .time-remaining {
+        font-size: 0.55rem !important;
+      }
+
+      .logout-btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Responsive untuk Mobile Portrait */
+    @media (max-width: 768px) and (orientation: portrait) {
+      .dashboard-header {
+        padding: 0.25rem 0;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0 0.5rem;
+      }
+
+      .header-left {
+        text-align: center;
+        width: 100%;
+      }
+
+      .header-left h1 {
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .live-indicator {
+        font-size: 0.75rem;
+        justify-content: center;
+      }
+
+      .header-right {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        align-items: center;
+      }
+
+      .search-input {
+        min-width: 180px;
+        font-size: 0.8rem;
+      }
+
+      .filter-dropdown, .dropdown-toggle {
+        min-width: 150px;
+        font-size: 0.8rem;
+      }
+
+      .dropdown-menu {
+        width: 200px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .board {
+        padding: 1px;
+        gap: 1px;
+      }
+
+      .row-header {
+        font-size: 0.9rem;
+        padding: 3px 6px;
+        height: 32px;
+      }
+
+      .row-content {
+        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-rows: repeat(4, 1fr) !important;
+        gap: 2px;
+        padding: 2px;
+      }
+
+      .order-rectangle {
+        min-height: 60px;
+        padding: 3px;
+      }
+
+      .order-number {
+        font-size: 0.75rem !important;
+        font-weight: 700;
+      }
+
+      .order-name {
+        font-size: 0.65rem !important;
+        line-height: 1.1;
+      }
+
+      .time-remaining {
+        font-size: 0.6rem !important;
+      }
+
+      .logout-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        width: 100px;
+      }
+
+      /* Penyesuaian untuk single section di mobile */
+      .single-section {
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(6, 1fr) !important;
+      }
+
+      .single-section .order-rectangle {
+        min-height: 70px;
+      }
+
+      .single-section .order-number {
+        font-size: 0.8rem !important;
+      }
+
+      .single-section .order-name {
+        font-size: 0.7rem !important;
+      }
+
+      .single-section .time-remaining {
+        font-size: 0.65rem !important;
+      }
+    }
+
+    /* Responsive untuk Mobile Kecil */
+    @media (max-width: 480px) {
+      .header-left h1 {
+        font-size: 1rem;
+      }
+
+      .search-input {
+        min-width: 150px;
+        font-size: 0.75rem;
+      }
+
+      .row-content {
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(6, 1fr) !important;
+      }
+
+      .order-rectangle {
+        min-height: 70px;
+      }
+
+      .order-number {
+        font-size: 0.7rem !important;
+      }
+
+      .order-name {
+        font-size: 0.6rem !important;
+      }
+
+      .time-remaining {
+        font-size: 0.55rem !important;
+      }
+
+      /* Single section untuk mobile kecil */
+      .single-section {
+        grid-template-columns: repeat(1, 1fr) !important;
+        grid-template-rows: repeat(12, 1fr) !important;
       }
     }
   `]
@@ -628,6 +915,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private refreshInterval: any;
   currentTime = new Date();
   selectedFilter = 'today'; // Default filter
+  
+  // Search filter property
+  searchFilter = '';
   
   // Section filter properties
   isDropdownOpen = false;
@@ -779,7 +1069,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   getLatestOrdersByStatus(status: string, limit?: number): ApiOrderItem[] {
     // Tampilkan semua data asli dengan filter tanggal dan custom sorting
     const filteredOrders = this.orders
-      .filter(order => order.Status === status && this.isWithinDateFilter(order));
+      .filter(order => order.Status === status && this.isWithinDateFilter(order) && this.isWithinSearchFilter(order));
     
     // Custom sorting berdasarkan color class
     const sortedOrders = filteredOrders.sort((a, b) => {
@@ -908,6 +1198,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
       default:
         return true;
     }
+  }
+
+  isWithinSearchFilter(order: ApiOrderItem): boolean {
+    // Jika tidak ada filter search, tampilkan semua
+    if (!this.searchFilter || this.searchFilter.trim() === '') {
+      return true;
+    }
+    
+    const searchTerm = this.searchFilter.toLowerCase().trim();
+    
+    // Search berdasarkan Order Number
+    const orderNumStr = order.OrderNum.toString();
+    if (orderNumStr.toLowerCase().includes(searchTerm)) {
+      return true;
+    }
+    
+    // Search berdasarkan Customer ID
+    if (order.CustomerID && order.CustomerID.toLowerCase().includes(searchTerm)) {
+      return true;
+    }
+    
+    // Search berdasarkan Name (Customer Name)
+    if (order.Name && order.Name.toLowerCase().includes(searchTerm)) {
+      return true;
+    }
+    
+    return false;
   }
 
   // Section filter methods

@@ -53,10 +53,26 @@ interface ApiOrderItem {
                 <option value="year">1 Year</option>
               </select>
             </div>
+            <div class="search-section">
+              <label for="search-input" class="search-label">Search:</label>
+              <input 
+                id="search-input"
+                type="text"
+                [(ngModel)]="searchQuery"
+                (input)="onSearchChange()"
+                placeholder="Order Number, Customer ID or Name..."
+                class="search-input">
+              @if (searchQuery) {
+                <button (click)="clearSearch()" class="clear-search-btn">×</button>
+              }
+            </div>
           </div>
           <div class="header-right">
             <div class="stats">
-              <span class="total-orders">Total: {{ orders.length }} orders</span>
+              <span class="total-orders">Total: {{ filteredOrders.length }} orders</span>
+              @if (searchQuery) {
+                <span class="search-info">({{ orders.length }} total)</span>
+              }
             </div>
           </div>
         </div>
@@ -70,7 +86,7 @@ interface ApiOrderItem {
           <div class="loading">Loading orders...</div>
         } @else {
           <div class="orders-grid">
-            @for (order of orders; track order.OrderNum) {
+            @for (order of filteredOrders; track order.OrderNum) {
               <div class="order-card" 
                    [class]="getColorClass(order)">
                 <div class="card-header">
@@ -143,6 +159,77 @@ interface ApiOrderItem {
 
     .header-center {
       flex: 0 0 auto;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .filter-section, .search-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    .search-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .search-input {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #dee2e6;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      min-width: 200px;
+      padding-right: 30px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .search-input::placeholder {
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #6c757d;
+      cursor: pointer;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .clear-search-btn:hover {
+      background: #e9ecef;
+      color: #333;
+    }
+
+    .search-info {
+      font-size: 0.875rem;
+      color: #6c757d;
+      font-weight: normal;
+      margin-left: 0.5rem;
     }
 
     .header-right {
@@ -369,6 +456,18 @@ interface ApiOrderItem {
       .header-center {
         align-self: center;
         order: 2;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .filter-section, .search-section {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+
+      .search-input {
+        min-width: 250px;
       }
 
       .header-right {
@@ -395,10 +494,12 @@ interface ApiOrderItem {
 export class StatusDetailComponent implements OnInit, OnDestroy {
   allOrders: ApiOrderItem[] = []; // Semua data dari API
   orders: ApiOrderItem[] = []; // Data yang sudah difilter untuk display
+  filteredOrders: ApiOrderItem[] = []; // Data setelah search filtering
   isLoading = true;
   error = '';
   status = '';
   filter = 'today';
+  searchQuery = ''; // Property untuk search
   private countdownInterval: any;
   currentTime = new Date();
 
@@ -439,6 +540,29 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
   onFilterChange() {
     // Client-side filtering only - tidak recall API
     this.applyFilters();
+  }
+
+  onSearchChange() {
+    this.applySearchFilter();
+  }
+
+  clearSearch() {
+    this.searchQuery = '';
+    this.applySearchFilter();
+  }
+
+  applySearchFilter() {
+    if (!this.searchQuery.trim()) {
+      this.filteredOrders = [...this.orders];
+      return;
+    }
+
+    const query = this.searchQuery.toLowerCase().trim();
+    this.filteredOrders = this.orders.filter(order => 
+      order.OrderNum.toString().includes(query) ||
+      order.CustomerID.toLowerCase().includes(query) ||
+      order.Name.toLowerCase().includes(query)
+    );
   }
 
   startLiveCountdown() {
@@ -488,6 +612,9 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
     this.orders = this.allOrders
       .filter(order => order.Status === this.status && this.isWithinDateFilter(order))
       .sort((a, b) => this.customSort(a, b));
+    
+    // Apply search filter after date/status filter
+    this.applySearchFilter();
   }
 
   customSort(a: ApiOrderItem, b: ApiOrderItem): number {
