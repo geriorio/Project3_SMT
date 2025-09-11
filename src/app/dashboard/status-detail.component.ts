@@ -45,6 +45,7 @@ interface ApiOrderItem {
                 [(ngModel)]="filter" 
                 (change)="onFilterChange()"
                 class="filter-dropdown">
+                <option value="all">All</option>
                 <option value="today">Today</option>
                 <option value="week">This Week</option>
                 <option value="month">This Month</option>
@@ -572,13 +573,13 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
   }
 
   fetchOrders() {
-    const url = 'https://epictestapp.samator.com/KineticTest2/api/v2/efx/SGI/FSMT069OrderDash/GetOrders';
+    const url = 'https://epicprodapp.samator.com/Kinetic/api/v2/efx/SGI/FSMT069OrderDash/GetOrders';
     const username = 'christo';
     const password = 'Chr15topherb@';
     const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
     
     const headers = new HttpHeaders({
-      'x-api-key': 'MtW5QmpH660283OeMjCoRhgvZf2WBe1nbJMT3bTyJfuhB',
+      'x-api-key': 'W5hczOaOGdc68PcfchvZSvhUmWOf9AX3P6Zhfm0cghdPu',
       'Content-Type': 'application/json',
       'Accept': '*/*',
       'Authorization': basicAuth
@@ -692,6 +693,11 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
   }
 
   isWithinDateFilter(order: ApiOrderItem): boolean {
+    // Jika filter adalah "all", tampilkan semua data
+    if (this.filter === 'all') {
+      return true;
+    }
+    
     if (!order.CreateDate) return false;
     
     const createDate = new Date(order.CreateDate);
@@ -722,6 +728,7 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
 
   getFilterLabel(): string {
     const filterLabels: { [key: string]: string } = {
+      'all': 'All',
       'today': 'Today',
       'week': 'This Week',
       'month': 'This Month',
