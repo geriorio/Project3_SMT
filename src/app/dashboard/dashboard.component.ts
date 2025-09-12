@@ -919,7 +919,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private countdownInterval: any;
   private refreshInterval: any;
   currentTime = new Date();
-  selectedFilter = 'today'; // Default filter
+  selectedFilter = 'all'; // Default filter - show all data
   
   // Search filter property
   searchFilter = '';
