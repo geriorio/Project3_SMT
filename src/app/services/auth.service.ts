@@ -2,6 +2,8 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
+declare var google: any;
+
 export interface User {
   email: string;
   name: string;
@@ -53,10 +55,29 @@ export class AuthService {
 
   logout() {
     if (isPlatformBrowser(this.platformId)) {
+      // Clear all user-related data from localStorage
       localStorage.removeItem('user');
+      
+      // Clear any other cached data (optional)
+      localStorage.removeItem('lastVisitedPage');
+      localStorage.removeItem('userPreferences');
+      
+      // Clear sessionStorage as well
+      sessionStorage.clear();
     }
+    
+    // Reset auth state
     this.isLoggedInSubject.next(false);
     this.currentUserSubject.next(null);
+    
+    // If using Google Sign-In, sign out from Google as well
+    if (isPlatformBrowser(this.platformId) && typeof google !== 'undefined' && google.accounts) {
+      try {
+        google.accounts.id.disableAutoSelect();
+      } catch (error) {
+        console.log('Google sign-out not available:', error);
+      }
+    }
   }
 
   isValidSamatorEmail(email: string): boolean {

@@ -1288,12 +1288,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openStatusDetail(status: string) {
     // Buka halaman baru dengan query parameter untuk status
-    const url = `/dashboard/detail?status=${encodeURIComponent(status)}&filter=${this.selectedFilter}`;
+    const url = `/queuedashboard/dashboard/detail?status=${encodeURIComponent(status)}&filter=${this.selectedFilter}`;
     window.open(url, '_blank');
   }
 
   logout() {
+    // Clean up timers before logout
+    this.cleanupTimers();
+    
+    // Perform actual logout
     this.authService.logout();
-    window.location.href = '/login';
+    
+    // Redirect to login page
+    window.location.href = '/queuedashboard/login';
   }
 }
