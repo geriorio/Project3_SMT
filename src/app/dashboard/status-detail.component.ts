@@ -499,7 +499,7 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
   isLoading = true;
   error = '';
   status = '';
-  filter = 'today';
+  filter = 'all';
   searchQuery = ''; // Property untuk search
   private countdownInterval: any;
   currentTime = new Date();
@@ -515,7 +515,7 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
     // Get parameters from URL
     this.route.queryParams.subscribe(params => {
       this.status = params['status'] || 'Order Placed';
-      this.filter = params['filter'] || 'today';
+      this.filter = params['filter'] || 'all';
     });
 
     // Cek apakah data sudah tersedia dari dashboard

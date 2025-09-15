@@ -16,6 +16,7 @@
             "outputPath": "dist/project3-smt",
             "index": "src/index.html",
             "browser": "src/main.ts",
+            "baseHref": "/queuedashboard/",
             "polyfills": [
               "zone.js"
             ],
@@ -46,8 +47,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "15kB"
                 }
               ],
               "outputHashing": "all"

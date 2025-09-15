@@ -319,6 +319,6 @@ export class LoginComponent implements OnInit {
     console.log('Login successful:', userInfo);
     
     // Redirect to dashboard
-    window.location.href = '/dashboard';
+    window.location.href = '/queuedashboard/dashboard';
   }
 }

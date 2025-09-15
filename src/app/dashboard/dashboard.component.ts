@@ -104,7 +104,7 @@ interface ApiOrderItem {
       </header>
 
       <!-- Main content -->
-      <div class="board-container" (click)="closeDropdown()">
+      <div class="board-container" (click)="closeDropdown()">>
         @if (error) {
           <div class="error-message">{{ error }}</div>
         } @else if (isLoading) {
@@ -118,7 +118,18 @@ interface ApiOrderItem {
             @for (section of getVisibleSections(); track section) {
               <div class="board-row" [style.height]="getSectionHeight()">
                 <div class="row-header clickable" (click)="openStatusDetail(section)">
-                  {{ section }}
+                  <div class="header-content">
+                    <span class="section-title">
+                      {{ section }}
+                      <button 
+                        class="info-button" 
+                        (click)="showTooltip(section, $event)"
+                        type="button"
+                        [attr.aria-label]="'Information about ' + section">
+                        ?
+                      </button>
+                    </span>
+                  </div>
                   <span class="expand-icon">→</span>
                 </div>
                 <div class="row-content" [ngClass]="{'single-section': getVisibleSections().length === 1}">
@@ -148,6 +159,21 @@ interface ApiOrderItem {
         }
       </div>
     </div>
+
+    <!-- Info Popup Modal -->
+    @if (activeTooltip) {
+      <div class="popup-overlay" (click)="hideTooltip()">
+        <div class="popup-modal" (click)="$event.stopPropagation()">
+          <div class="popup-header">
+            <h3>{{ activeTooltip }} Information</h3>
+            <button class="popup-close" (click)="hideTooltip()" type="button">×</button>
+          </div>
+          <div class="popup-content">
+            {{ getSectionInfo(activeTooltip) }}
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     .dashboard-container {
@@ -430,6 +456,150 @@ interface ApiOrderItem {
       align-items: center;
       justify-content: space-between;
       flex: 0 0 auto;
+      position: relative;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      pointer-events: none; /* Prevent this from intercepting clicks */
+    }
+
+    .section-title .info-button {
+      pointer-events: auto; /* Re-enable clicks for the button */
+    }
+
+    .info-button {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid #007bff;
+      background: #007bff;
+      color: white;
+      font-size: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      padding: 5px; /* Further reduced padding */
+      line-height: 1;
+      margin-left: 6px;
+      position: relative;
+      min-width: 22px; /* Further reduced minimum clickable area */
+      min-height: 22px; /* Further reduced minimum clickable area */
+      border-radius: 50%;
+    }
+
+    .info-button:hover {
+      background: #0056b3;
+      border-color: #0056b3;
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+
+    .info-button:active {
+      transform: scale(0.95);
+    }
+
+    .info-button:focus {
+      outline: 2px solid rgba(0, 123, 255, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* Popup Modal Styles */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .popup-modal {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: hidden;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .popup-header {
+      background: #f8f9fa;
+      padding: 16px 20px;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .popup-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .popup-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6c757d;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .popup-close:hover {
+      background: #e9ecef;
+      color: #333;
+    }
+
+    .popup-content {
+      padding: 20px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #333;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .row-content {
@@ -919,7 +1089,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private countdownInterval: any;
   private refreshInterval: any;
   currentTime = new Date();
-  selectedFilter = 'today'; // Default filter
+  selectedFilter = 'all'; // Default filter - show all data
   
   // Search filter property
   searchFilter = '';
@@ -939,6 +1109,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     'Delivery Planning',
     'Dispatched for Delivery'
   ];
+
+  // Section information tooltips
+  sectionInfos = {
+    'Order Placed': 'Order has been created but has not been declared as Ready To Process',
+    'Credit Review': 'Order has been declared as Ready To Process but needs Credit Release',
+    'Delivery Planning': 'Order has been declared as Ready To Process and does not need Credit Release but has not been processed (Not yet Print Packing Slip)',
+    'Dispatched for Delivery': 'Packing Slip has been printed'
+  };
+
+  // Tooltip visibility state
+  activeTooltip: string | null = null;
 
   constructor(
     private http: HttpClient,
@@ -1286,14 +1467,35 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isDropdownOpen = false;
   }
 
+  // Tooltip methods
+  showTooltip(section: string, event: Event) {
+    event.stopPropagation(); // Prevent triggering the section click
+    event.preventDefault(); // Prevent any default behavior
+    this.activeTooltip = this.activeTooltip === section ? null : section;
+  }
+
+  hideTooltip() {
+    this.activeTooltip = null;
+  }
+
+  getSectionInfo(section: string): string {
+    return this.sectionInfos[section as keyof typeof this.sectionInfos] || '';
+  }
+
   openStatusDetail(status: string) {
     // Buka halaman baru dengan query parameter untuk status
-    const url = `/dashboard/detail?status=${encodeURIComponent(status)}&filter=${this.selectedFilter}`;
+    const url = `/queuedashboard/dashboard/detail?status=${encodeURIComponent(status)}&filter=${this.selectedFilter}`;
     window.open(url, '_blank');
   }
 
   logout() {
+    // Clean up timers before logout
+    this.cleanupTimers();
+    
+    // Perform actual logout
     this.authService.logout();
-    window.location.href = '/login';
+    
+    // Redirect to login page
+    window.location.href = '/queuedashboard/login';
   }
 }
