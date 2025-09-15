@@ -104,7 +104,7 @@ interface ApiOrderItem {
       </header>
 
       <!-- Main content -->
-      <div class="board-container" (click)="closeDropdown()">>
+      <div class="board-container" (click)="closeDropdown()">
         @if (error) {
           <div class="error-message">{{ error }}</div>
         } @else if (isLoading) {
