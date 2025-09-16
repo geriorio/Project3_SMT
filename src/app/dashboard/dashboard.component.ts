@@ -182,45 +182,44 @@ interface ApiOrderItem {
     @if (isOrderModalOpen && selectedOrder) {
       <div class="modal-overlay" (click)="closeOrderModal()">
         <div class="order-modal" (click)="$event.stopPropagation()">
-          <div class="modal-header">
-            <h3>Order Details</h3>
-            <button class="modal-close" (click)="closeOrderModal()" type="button">×</button>
-          </div>
+          <button class="modal-close-simple" (click)="closeOrderModal()" type="button">×</button>
           <div class="modal-content">
-            <div class="order-card-modal" [class]="getColorClass(selectedOrder)">
-              <div class="card-header-modal">
-                <span class="order-number-modal">Order #{{ selectedOrder.OrderNum }}</span>
-                <span class="color-indicator-modal" [class]="getColorClass(selectedOrder)"></span>
+            <div class="order-card-detail" [class]="getColorClass(selectedOrder)">
+              <div class="card-header-detail">
+                <div class="header-left-detail">
+                  <span class="order-number-detail">Order #{{ selectedOrder.OrderNum }}</span>
+                  <span class="color-indicator-detail" [class]="getColorClass(selectedOrder)"></span>
+                </div>
               </div>
-              <div class="card-body-modal">
-                <div class="order-info-modal">
-                  <div class="info-row-modal">
+              <div class="card-body-detail">
+                <div class="order-info-detail">
+                  <div class="info-row-detail">
                     <label>Customer:</label>
                     <span>{{ selectedOrder.CustomerID }}</span>
                   </div>
-                  <div class="info-row-modal">
+                  <div class="info-row-detail">
                     <label>Name:</label>
                     <span>{{ selectedOrder.Name }}</span>
                   </div>
-                  <div class="info-row-modal">
+                  <div class="info-row-detail">
                     <label>PO Number:</label>
                     <span>{{ selectedOrder.PONum || 'N/A' }}</span>
                   </div>
-                  <div class="info-row-modal">
+                  <div class="info-row-detail">
                     <label>Created:</label>
                     <span>{{ selectedOrder.CreateDate | date:'dd/MM/yyyy HH:mm' }}</span>
                   </div>
-                  <div class="info-row-modal">
+                  <div class="info-row-detail">
                     <label>Order Date:</label>
                     <span>{{ selectedOrder.OrderDate | date:'dd/MM/yyyy' }}</span>
                   </div>
-                  <div class="info-row-modal">
+                  <div class="info-row-detail">
                     <label>Need By:</label>
                     <span>{{ selectedOrder.NeedByDate | date:'dd/MM/yyyy' }}</span>
                   </div>
-                  <div class="info-row-modal time-row-modal">
+                  <div class="info-row-detail time-row-detail">
                     <label>Time Remaining:</label>
-                    <span class="time-value-modal" [class]="getColorClass(selectedOrder)">{{ getTimeRemainingForModal(selectedOrder) }}</span>
+                    <span class="time-value-detail" [class]="getColorClass(selectedOrder)">{{ getTimeRemainingForModal(selectedOrder) }}</span>
                   </div>
                 </div>
               </div>
@@ -685,38 +684,26 @@ interface ApiOrderItem {
     }
 
     .order-modal {
-      background: white;
+      background: transparent;
       border-radius: 12px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      box-shadow: none;
       max-width: 500px;
       width: 90%;
       max-height: 80vh;
       overflow: hidden;
       animation: slideIn 0.3s ease-out;
+      position: relative;
     }
 
-    .modal-header {
-      background: #f8f9fa;
-      padding: 16px 20px;
-      border-bottom: 1px solid #dee2e6;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .modal-header h3 {
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .modal-close {
-      background: none;
+    .modal-close-simple {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.6);
       border: none;
-      font-size: 24px;
+      font-size: 20px;
       cursor: pointer;
-      color: #6c757d;
+      color: white;
       width: 30px;
       height: 30px;
       display: flex;
@@ -724,135 +711,142 @@ interface ApiOrderItem {
       justify-content: center;
       border-radius: 50%;
       transition: all 0.2s ease;
+      z-index: 10;
+      font-weight: bold;
     }
 
-    .modal-close:hover {
-      background: #e9ecef;
-      color: #333;
+    .modal-close-simple:hover {
+      background: rgba(0, 0, 0, 0.8);
+      transform: scale(1.1);
     }
 
     .modal-content {
       padding: 0;
     }
 
-    .order-card-modal {
+    .order-card-detail {
       background: white;
-      border-radius: 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       overflow: hidden;
       border-left: 4px solid #dee2e6;
-      margin: 0;
     }
 
-    .order-card-modal.color-green {
+    .order-card-detail.color-green {
       border-left-color: #28a745;
+      background: white !important;
     }
 
-    .order-card-modal.color-yellow {
+    .order-card-detail.color-yellow {
       border-left-color: #ffc107;
+      background: white !important;
     }
 
-    .order-card-modal.color-red {
+    .order-card-detail.color-red {
       border-left-color: #dc3545;
+      background: white !important;
     }
 
-    .card-header-modal {
+    .card-header-detail {
       background: #f8f9fa;
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 1rem;
       border-bottom: 1px solid #e9ecef;
     }
 
-    .order-number-modal {
+    .header-left-detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .order-number-detail {
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: #333;
     }
 
-    .color-indicator-modal {
-      width: 16px;
-      height: 16px;
+    .color-indicator-detail {
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       display: inline-block;
+      flex-shrink: 0;
     }
 
-    .color-indicator-modal.color-green {
+    .color-indicator-detail.color-green {
       background: #28a745;
     }
 
-    .color-indicator-modal.color-yellow {
+    .color-indicator-detail.color-yellow {
       background: #ffc107;
     }
 
-    .color-indicator-modal.color-red {
+    .color-indicator-detail.color-red {
       background: #dc3545;
     }
 
-    .card-body-modal {
-      padding: 20px;
+    .card-body-detail {
+      padding: 1rem;
+      background: white !important;
     }
 
-    .order-info-modal {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .order-info-detail {
+      background: white !important;
     }
 
-    .info-row-modal {
+    .info-row-detail {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #f8f9fa;
+      margin-bottom: 0.5rem;
+      padding: 0.25rem 0;
+      background: white !important;
     }
 
-    .info-row-modal:last-child {
-      border-bottom: none;
-    }
-
-    .info-row-modal label {
+    .info-row-detail label {
       font-weight: 600;
       color: #333;
       min-width: 120px;
-      font-size: 0.95rem;
     }
 
-    .info-row-modal span {
-      color: white;
+    .info-row-detail span {
+      color: #6c757d;
       text-align: right;
-      font-size: 0.95rem;
-      background: #6c757d;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: 500;
     }
 
-    .time-row-modal {
-      border-top: 2px solid #e9ecef !important;
-      padding-top: 16px !important;
-      margin-top: 8px;
-    }
-
-    .time-value-modal {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: white !important;
-      padding: 6px 12px;
-      border-radius: 6px;
-    }
-
-    .time-value-modal.color-green {
-      background: #28a745;
-    }
-
-    .time-value-modal.color-yellow {
-      background: #ffc107;
+    .order-card-detail .info-row-detail label {
       color: #333 !important;
     }
 
-    .time-value-modal.color-red {
-      background: #dc3545;
+    .order-card-detail .info-row-detail span {
+      color: #6c757d !important;
+    }
+
+    .time-row-detail {
+      border-top: 1px solid #e9ecef;
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .time-value-detail {
+      font-weight: 700;
+      font-size: 1rem;
+      background: none !important;
+      padding: 0 !important;
+    }
+
+    .time-value-detail.color-green {
+      color: #28a745;
+      background: none !important;
+    }
+
+    .time-value-detail.color-yellow {
+      color: #856404;
+      background: none !important;
+    }
+
+    .time-value-detail.color-red {
+      color: #dc3545;
+      background: none !important;
     }
 
     .row-content {
@@ -869,26 +863,11 @@ interface ApiOrderItem {
       max-width: 100%;
     }
 
-    .row-content.single-section {
-      grid-template-rows: repeat(9, 1fr);
-      gap: 4px;
-      padding: 8px;
-    }
-
-    /* 2 sections selected */
-    .row-content:not(.single-section) {
-      grid-template-rows: repeat(4, 1fr);
-    }
-
-    /* Untuk 3 sections */
-    .three-sections .row-content {
-      grid-template-rows: repeat(3, 1fr);
-    }
-
-    /* Untuk 4 sections */
-    .four-sections .row-content {
-      grid-template-rows: repeat(2, 1fr);
-    }
+    /* CSS untuk grid layout berdasarkan jumlah section */
+    .row-content.single-section { grid-template-rows: repeat(9, 1fr); gap: 4px; padding: 8px; }
+    .row-content:not(.single-section) { grid-template-rows: repeat(4, 1fr); }
+    .three-sections .row-content { grid-template-rows: repeat(3, 1fr); }
+    .four-sections .row-content { grid-template-rows: repeat(2, 1fr); }
 
     .board-row {
       background: white;
@@ -994,78 +973,28 @@ interface ApiOrderItem {
       text-align: center;
     }
 
-    /* CSS untuk single section - 9 baris */
-    .single-section .order-number {
-      font-size: 0.75rem;
-    }
+    /* Font sizing berdasarkan layout */
+    .single-section .order-number { font-size: 0.75rem; }
+    .single-section .order-name { font-size: 0.95rem; }
+    .single-section .time-remaining { font-size: 0.65rem; }
+    .row-content:not(.single-section) .order-number { font-size: 0.85rem; }
+    .row-content:not(.single-section) .order-name { font-size: 0.95rem; }
+    .row-content:not(.single-section) .time-remaining { font-size: 0.75rem; }
+    .three-sections .row-content .order-number { font-size: 0.9rem; }
+    .three-sections .row-content .order-name { font-size: 0.75rem; }
+    .three-sections .row-content .time-remaining { font-size: 0.8rem; }
+    .four-sections .row-content .order-number { font-size: 1rem; }
+    .four-sections .row-content .order-name { font-size: 0.8rem; }
+    .four-sections .row-content .time-remaining { font-size: 0.85rem; }
 
-    .single-section .order-name {
-      font-size: 0.95rem;
-    }
-
-    .single-section .time-remaining {
-      font-size: 0.65rem;
-    }
-
-    /* CSS untuk 2 sections - 4 baris per section */
-    .row-content:not(.single-section) .order-number {
-      font-size: 0.85rem;
-    }
-
-    .row-content:not(.single-section) .order-name {
-      font-size: 0.95rem;
-    }
-
-    .row-content:not(.single-section) .time-remaining {
-      font-size: 0.75rem;
-    }
-
-    /* CSS untuk 3 sections - 3 baris per section */
-    .three-sections .row-content .order-number {
-      font-size: 0.9rem;
-    }
-
-    .three-sections .row-content .order-name {
-      font-size: 0.75rem;
-    }
-
-    .three-sections .row-content .time-remaining {
-      font-size: 0.8rem;
-    }
-
-    /* CSS untuk 4 sections - 2 baris per section */
-    .four-sections .row-content .order-number {
-      font-size: 1rem;
-    }
-
-    .four-sections .row-content .order-name {
-      font-size: 0.8rem;
-    }
-
-    .four-sections .row-content .time-remaining {
-      font-size: 0.85rem;
-    }
-
-    /* Styling khusus untuk overdue text - DIHAPUS untuk fokus fungsionalitas */
-
+    /* Color classes */
     .status-placed { background: #28a745; }
     .status-credit { background: #ffc107; color: #333; }
     .status-planning { background: #17a2b8; }
     .status-dispatched { background: #6f42c1; }
-
-    /* Color coding berdasarkan CreateDate + 48 jam */
-    .color-green { 
-      background: #28a745; 
-      color: white;
-    } /* >12 jam */
-    .color-yellow { 
-      background: #ffc107; 
-      color: #333;
-    } /* >0 <=12 jam */
-    .color-red { 
-      background: #dc3545; 
-      color: white;
-    } /* <=0 jam */
+    .color-green { background: #28a745; color: white; }
+    .color-yellow { background: #ffc107; color: #333; }
+    .color-red { background: #dc3545; color: white; }
 
     .loading, .error-message {
       text-align: center;
@@ -1080,311 +1009,120 @@ interface ApiOrderItem {
       border-radius: 4px;
     }
 
-    /* Responsive untuk Tablet - ukuran sedang */
+    /* Tablet responsive */
     @media (max-width: 1024px) and (min-width: 769px) {
-      .header-content {
-        padding: 0 0.75rem;
-      }
-
-      .search-input {
-        min-width: 150px;
-        font-size: 0.8rem;
-      }
-
-      .filter-dropdown, .dropdown-toggle {
-        min-width: 120px;
-        font-size: 0.8rem;
-      }
-
-      .row-content {
-        grid-template-columns: repeat(6, minmax(120px, 1fr)) !important;
-        grid-template-rows: repeat(3, 1fr) !important;
-        gap: 3px;
-      }
-
-      .order-number {
-        font-size: 0.8rem !important;
-      }
-
-      .order-name {
-        font-size: 0.7rem !important;
-      }
-
-      .time-remaining {
-        font-size: 0.65rem !important;
-      }
-
-      .order-counter {
-        font-size: 0.7rem;
-        padding: 1px 5px;
-        margin-left: 6px;
-      }
+      .header-content { padding: 0 0.75rem; }
+      .search-input { min-width: 150px; font-size: 0.8rem; }
+      .filter-dropdown, .dropdown-toggle { min-width: 120px; font-size: 0.8rem; }
+      .row-content { grid-template-columns: repeat(6, minmax(120px, 1fr)) !important; grid-template-rows: repeat(3, 1fr) !important; gap: 3px; }
+      .order-number { font-size: 0.8rem !important; }
+      .order-name { font-size: 0.7rem !important; }
+      .time-remaining { font-size: 0.65rem !important; }
+      .order-counter { font-size: 0.7rem; padding: 1px 5px; margin-left: 6px; }
+      .order-modal { width: 80%; max-width: 450px; }
+      .modal-close-simple { top: 10px; right: 10px; width: 30px; height: 30px; font-size: 20px; }
+      .modal-content { padding: 0; }
+      .card-header-detail { padding: 1rem; }
+      .header-left-detail { gap: 6px; }
+      .order-number-detail { font-size: 1.2rem; }
+      .color-indicator-detail { width: 10px; height: 10px; }
+      .card-body-detail { padding: 1rem; }
+      .info-row-detail { margin-bottom: 1rem; }
+      .info-row-detail label { min-width: 100px; font-size: 1rem; }
+      .info-row-detail span { font-size: 1rem; }
+      .time-value-detail { font-size: 1rem; }
     }
 
-    /* Responsive untuk Mobile Landscape */
+    /* Mobile landscape responsive */
     @media (max-width: 768px) and (orientation: landscape) {
-      .dashboard-header {
-        padding: 0.15rem 0;
-      }
-
-      .header-content {
-        flex-direction: row;
-        gap: 0.5rem;
-        padding: 0 0.5rem;
-      }
-
-      .header-left h1 {
-        font-size: 1rem;
-      }
-
-      .live-indicator {
-        font-size: 0.75rem;
-      }
-
-      .search-input {
-        min-width: 120px;
-        font-size: 0.75rem;
-        padding: 0.25rem;
-      }
-
-      .filter-dropdown, .dropdown-toggle {
-        min-width: 100px;
-        font-size: 0.75rem;
-        padding: 0.25rem;
-      }
-
-      .row-content {
-        grid-template-columns: repeat(8, minmax(80px, 1fr)) !important;
-        grid-template-rows: repeat(2, 1fr) !important;
-        gap: 2px;
-        padding: 2px;
-      }
-
-      .order-rectangle {
-        min-height: 45px;
-      }
-
-      .order-number {
-        font-size: 0.7rem !important;
-      }
-
-      .order-name {
-        font-size: 0.6rem !important;
-      }
-
-      .time-remaining {
-        font-size: 0.55rem !important;
-      }
-
-      .logout-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-      }
-
-      .order-counter {
-        font-size: 0.65rem;
-        padding: 1px 4px;
-        margin-left: 5px;
-      }
+      .dashboard-header { padding: 0.15rem 0; }
+      .header-content { flex-direction: row; gap: 0.5rem; padding: 0 0.5rem; }
+      .header-left h1 { font-size: 1rem; }
+      .live-indicator { font-size: 0.75rem; }
+      .search-input { min-width: 120px; font-size: 0.75rem; padding: 0.25rem; }
+      .filter-dropdown, .dropdown-toggle { min-width: 100px; font-size: 0.75rem; padding: 0.25rem; }
+      .row-content { grid-template-columns: repeat(8, minmax(80px, 1fr)) !important; grid-template-rows: repeat(2, 1fr) !important; gap: 2px; padding: 2px; }
+      .order-rectangle { min-height: 45px; }
+      .order-number { font-size: 0.7rem !important; }
+      .order-name { font-size: 0.6rem !important; }
+      .time-remaining { font-size: 0.55rem !important; }
+      .logout-btn { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+      .order-counter { font-size: 0.65rem; padding: 1px 4px; margin-left: 5px; }
+      .order-modal { width: 90%; max-width: 400px; }
+      .modal-close-simple { top: 8px; right: 8px; width: 28px; height: 28px; font-size: 18px; }
+      .modal-content { padding: 0; }
+      .card-header-detail { padding: 0.75rem; }
+      .header-left-detail { gap: 6px; }
+      .order-number-detail { font-size: 1rem; }
+      .color-indicator-detail { width: 10px; height: 10px; }
+      .card-body-detail { padding: 0.75rem; }
+      .info-row-detail { flex-direction: row; align-items: center; gap: 8px; margin-bottom: 0.75rem; }
+      .info-row-detail label { min-width: 80px; font-size: 0.9rem; }
+      .info-row-detail span { font-size: 0.9rem; }
+      .time-value-detail { font-size: 0.9rem; }
     }
 
-    /* Responsive untuk Mobile Portrait */
+    /* Mobile portrait responsive */
     @media (max-width: 768px) and (orientation: portrait) {
-      .dashboard-header {
-        padding: 0.25rem 0;
-      }
-
-      .header-content {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: center;
-        padding: 0 0.5rem;
-      }
-
-      .header-left {
-        text-align: center;
-        width: 100%;
-      }
-
-      .header-left h1 {
-        font-size: 1.1rem;
-        margin-bottom: 0.25rem;
-      }
-
-      .live-indicator {
-        font-size: 0.75rem;
-        justify-content: center;
-      }
-
-      .header-right {
-        flex-direction: column;
-        gap: 0.5rem;
-        width: 100%;
-        align-items: center;
-      }
-
-      .search-input {
-        min-width: 180px;
-        font-size: 0.8rem;
-      }
-
-      .filter-dropdown, .dropdown-toggle {
-        min-width: 150px;
-        font-size: 0.8rem;
-      }
-
-      .dropdown-menu {
-        width: 200px;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
-      .board {
-        padding: 1px;
-        gap: 1px;
-      }
-
-      .row-header {
-        font-size: 0.9rem;
-        padding: 3px 6px;
-        height: 32px;
-      }
-
-      .order-counter {
-        font-size: 0.65rem;
-        padding: 1px 4px;
-        margin-left: 6px;
-      }
-
-      .row-content {
-        grid-template-columns: repeat(3, 1fr) !important;
-        grid-template-rows: repeat(4, 1fr) !important;
-        gap: 2px;
-        padding: 2px;
-      }
-
-      .order-rectangle {
-        min-height: 60px;
-        padding: 3px;
-      }
-
-      .order-number {
-        font-size: 0.75rem !important;
-        font-weight: 700;
-      }
-
-      .order-name {
-        font-size: 0.65rem !important;
-        line-height: 1.1;
-      }
-
-      .time-remaining {
-        font-size: 0.6rem !important;
-      }
-
-      .logout-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-        width: 100px;
-      }
-
-      /* Penyesuaian untuk single section di mobile */
-      .single-section {
-        grid-template-columns: repeat(2, 1fr) !important;
-        grid-template-rows: repeat(6, 1fr) !important;
-      }
-
-      .single-section .order-rectangle {
-        min-height: 70px;
-      }
-
-      .single-section .order-number {
-        font-size: 0.8rem !important;
-      }
-
-      .single-section .order-name {
-        font-size: 0.7rem !important;
-      }
-
-      .single-section .time-remaining {
-        font-size: 0.65rem !important;
-      }
-
-      /* Modal responsive untuk mobile portrait */
-      .order-modal {
-        width: 95%;
-        max-width: 350px;
-      }
-
-      .modal-header h3 {
-        font-size: 1.1rem;
-      }
-
-      .card-body-modal {
-        padding: 16px;
-      }
-
-      .info-row-modal {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-        padding: 8px 0;
-      }
-
-      .info-row-modal span {
-        text-align: left;
-        font-size: 0.9rem;
-        margin-top: 4px;
-        width: 100%;
-      }
-
-      .info-row-modal label {
-        font-size: 0.9rem;
-      }
-
-      .time-value-modal {
-        font-size: 1rem !important;
-        padding: 4px 8px !important;
-      }
+      .dashboard-header { padding: 0.25rem 0; }
+      .header-content { flex-direction: column; gap: 0.5rem; align-items: center; padding: 0 0.5rem; }
+      .header-left { text-align: center; width: 100%; }
+      .header-left h1 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+      .live-indicator { font-size: 0.75rem; justify-content: center; }
+      .header-right { flex-direction: column; gap: 0.5rem; width: 100%; align-items: center; }
+      .search-input { min-width: 180px; font-size: 0.8rem; }
+      .filter-dropdown, .dropdown-toggle { min-width: 150px; font-size: 0.8rem; }
+      .dropdown-menu { width: 200px; left: 50%; transform: translateX(-50%); }
+      .board { padding: 1px; gap: 1px; }
+      .row-header { font-size: 0.9rem; padding: 3px 6px; height: 32px; }
+      .order-counter { font-size: 0.65rem; padding: 1px 4px; margin-left: 6px; }
+      .row-content { grid-template-columns: repeat(3, 1fr) !important; grid-template-rows: repeat(4, 1fr) !important; gap: 2px; padding: 2px; }
+      .order-rectangle { min-height: 60px; padding: 3px; }
+      .order-number { font-size: 0.75rem !important; font-weight: 700; }
+      .order-name { font-size: 0.65rem !important; line-height: 1.1; }
+      .time-remaining { font-size: 0.6rem !important; }
+      .logout-btn { padding: 0.4rem 0.8rem; font-size: 0.8rem; width: 100px; }
+      .single-section { grid-template-columns: repeat(2, 1fr) !important; grid-template-rows: repeat(6, 1fr) !important; }
+      .single-section .order-rectangle { min-height: 70px; }
+      .single-section .order-number { font-size: 0.8rem !important; }
+      .single-section .order-name { font-size: 0.7rem !important; }
+      .single-section .time-remaining { font-size: 0.65rem !important; }
+      .order-modal { width: 95%; max-width: 350px; }
+      .modal-close-simple { top: 8px; right: 8px; width: 28px; height: 28px; font-size: 18px; }
+      .modal-content { padding: 0; }
+      .card-header-detail { padding: 0.75rem; }
+      .header-left-detail { gap: 6px; }
+      .order-number-detail { font-size: 1rem; }
+      .color-indicator-detail { width: 10px; height: 10px; }
+      .card-body-detail { padding: 0.75rem; }
+      .info-row-detail { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 0.75rem; }
+      .info-row-detail label { min-width: auto; font-size: 0.9rem; }
+      .info-row-detail span { text-align: left; font-size: 0.9rem; }
+      .time-value-detail { font-size: 0.9rem; }
     }
 
-    /* Responsive untuk Mobile Kecil */
+    /* Mobile kecil responsive */
     @media (max-width: 480px) {
-      .header-left h1 {
-        font-size: 1rem;
-      }
-
-      .search-input {
-        min-width: 150px;
-        font-size: 0.75rem;
-      }
-
-      .row-content {
-        grid-template-columns: repeat(2, 1fr) !important;
-        grid-template-rows: repeat(6, 1fr) !important;
-      }
-
-      .order-rectangle {
-        min-height: 70px;
-      }
-
-      .order-number {
-        font-size: 0.7rem !important;
-      }
-
-      .order-name {
-        font-size: 0.6rem !important;
-      }
-
-      .time-remaining {
-        font-size: 0.55rem !important;
-      }
-
-      /* Single section untuk mobile kecil */
-      .single-section {
-        grid-template-columns: repeat(1, 1fr) !important;
-        grid-template-rows: repeat(12, 1fr) !important;
-      }
+      .header-left h1 { font-size: 1rem; }
+      .search-input { min-width: 150px; font-size: 0.75rem; }
+      .row-content { grid-template-columns: repeat(2, 1fr) !important; grid-template-rows: repeat(6, 1fr) !important; }
+      .order-rectangle { min-height: 70px; }
+      .order-number { font-size: 0.7rem !important; }
+      .order-name { font-size: 0.6rem !important; }
+      .time-remaining { font-size: 0.55rem !important; }
+      .single-section { grid-template-columns: repeat(1, 1fr) !important; grid-template-rows: repeat(12, 1fr) !important; }
+      .order-modal { width: 95%; max-width: 320px; }
+      .modal-close-simple { top: 6px; right: 6px; width: 26px; height: 26px; font-size: 16px; }
+      .modal-content { padding: 0; }
+      .card-header-detail { padding: 0.5rem; }
+      .header-left-detail { gap: 4px; }
+      .order-number-detail { font-size: 0.9rem; }
+      .color-indicator-detail { width: 8px; height: 8px; }
+      .card-body-detail { padding: 0.5rem; }
+      .info-row-detail { flex-direction: column; align-items: flex-start; gap: 2px; margin-bottom: 0.5rem; }
+      .info-row-detail label { min-width: auto; font-size: 0.8rem; }
+      .info-row-detail span { text-align: left; font-size: 0.8rem; }
+      .time-value-detail { font-size: 0.8rem; }
     }
   `]
 })
