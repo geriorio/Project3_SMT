@@ -1,0 +1,51 @@
+<div class="order-dashboard">
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Memuat data order...</p>
+  </div>
+  
+  <div *ngIf="error" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <h3>Terjadi Kesalahan</h3>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="ngOnInit()">Coba Lagi</button>
+  </div>
+  
+  <div *ngIf="!loading && !error && orders.length" class="orders-container">
+    <div class="orders-header">
+      <h3>📋 Data Order Terbaru</h3>
+      <div class="orders-count">
+        <span class="count">{{ orders.length }}</span>
+        <span class="label">Total Orders</span>
+      </div>
+    </div>
+    
+    <div class="orders-grid">
+      <div *ngFor="let order of orders; let i = index" class="order-card">
+        <div class="order-header">
+          <div class="order-number">
+            <span class="order-label">Order #</span>
+            <span class="order-id">{{ i + 1 }}</span>
+          </div>
+          <div class="order-status" [class]="getStatusClass(order)">
+            {{ getOrderStatus(order) }}
+          </div>
+        </div>
+        
+        <div class="order-details">
+          <div *ngFor="let key of order | keys" class="detail-row">
+            <span class="detail-label">{{ formatLabel(key) }}:</span>
+            <span class="detail-value">{{ formatValue(order[key]) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="!loading && !error && !orders.length" class="empty-state">
+    <div class="empty-icon">📋</div>
+    <h3>Belum Ada Data Order</h3>
+    <p>Saat ini belum ada data order yang tersedia.</p>
+    <button class="btn-add">➕ Tambah Order Baru</button>
+  </div>
+</div>
