@@ -64,7 +64,7 @@ interface ApiOrderItem {
                 id="search-input"
                 type="text" 
                 [(ngModel)]="searchFilter" 
-                placeholder="Order Number, Customer ID"
+                placeholder="Order Number, Customer ID, Name, PO Number"
                 class="search-input">
             </div>
             
@@ -138,6 +138,7 @@ interface ApiOrderItem {
                   @for (order of getLatestOrdersByStatus(section); track order.OrderNum) {
                     <div class="order-rectangle" 
                          [class]="getColorClass(order)" 
+                         (click)="openOrderModal(order, $event)"
                          [title]="'Order: ' + order.OrderNum + '\\nCustomer: ' + order.CustomerID + '\\nName: ' + order.Name + '\\nTime remaining: ' + getTimeRemaining(order)">
                       <div class="order-content">
                         <div class="order-number">{{ order.OrderNum }}</div>
@@ -172,6 +173,58 @@ interface ApiOrderItem {
           </div>
           <div class="popup-content">
             {{ getSectionInfo(activeTooltip) }}
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Order Detail Modal -->
+    @if (isOrderModalOpen && selectedOrder) {
+      <div class="modal-overlay" (click)="closeOrderModal()">
+        <div class="order-modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Order Details</h3>
+            <button class="modal-close" (click)="closeOrderModal()" type="button">×</button>
+          </div>
+          <div class="modal-content">
+            <div class="order-card-modal" [class]="getColorClass(selectedOrder)">
+              <div class="card-header-modal">
+                <span class="order-number-modal">Order #{{ selectedOrder.OrderNum }}</span>
+                <span class="color-indicator-modal" [class]="getColorClass(selectedOrder)"></span>
+              </div>
+              <div class="card-body-modal">
+                <div class="order-info-modal">
+                  <div class="info-row-modal">
+                    <label>Customer:</label>
+                    <span>{{ selectedOrder.CustomerID }}</span>
+                  </div>
+                  <div class="info-row-modal">
+                    <label>Name:</label>
+                    <span>{{ selectedOrder.Name }}</span>
+                  </div>
+                  <div class="info-row-modal">
+                    <label>PO Number:</label>
+                    <span>{{ selectedOrder.PONum || 'N/A' }}</span>
+                  </div>
+                  <div class="info-row-modal">
+                    <label>Created:</label>
+                    <span>{{ selectedOrder.CreateDate | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <div class="info-row-modal">
+                    <label>Order Date:</label>
+                    <span>{{ selectedOrder.OrderDate | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  <div class="info-row-modal">
+                    <label>Need By:</label>
+                    <span>{{ selectedOrder.NeedByDate | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  <div class="info-row-modal time-row-modal">
+                    <label>Time Remaining:</label>
+                    <span class="time-value-modal" [class]="getColorClass(selectedOrder)">{{ getTimeRemainingForModal(selectedOrder) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -614,6 +667,192 @@ interface ApiOrderItem {
         opacity: 1;
         transform: translateY(0) scale(1);
       }
+    }
+
+    /* Order Detail Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1100;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .order-modal {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: hidden;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .modal-header {
+      background: #f8f9fa;
+      padding: 16px 20px;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6c757d;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: #e9ecef;
+      color: #333;
+    }
+
+    .modal-content {
+      padding: 0;
+    }
+
+    .order-card-modal {
+      background: white;
+      border-radius: 0;
+      overflow: hidden;
+      border-left: 4px solid #dee2e6;
+      margin: 0;
+    }
+
+    .order-card-modal.color-green {
+      border-left-color: #28a745;
+    }
+
+    .order-card-modal.color-yellow {
+      border-left-color: #ffc107;
+    }
+
+    .order-card-modal.color-red {
+      border-left-color: #dc3545;
+    }
+
+    .card-header-modal {
+      background: #f8f9fa;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .order-number-modal {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .color-indicator-modal {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .color-indicator-modal.color-green {
+      background: #28a745;
+    }
+
+    .color-indicator-modal.color-yellow {
+      background: #ffc107;
+    }
+
+    .color-indicator-modal.color-red {
+      background: #dc3545;
+    }
+
+    .card-body-modal {
+      padding: 20px;
+    }
+
+    .order-info-modal {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .info-row-modal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f8f9fa;
+    }
+
+    .info-row-modal:last-child {
+      border-bottom: none;
+    }
+
+    .info-row-modal label {
+      font-weight: 600;
+      color: #333;
+      min-width: 120px;
+      font-size: 0.95rem;
+    }
+
+    .info-row-modal span {
+      color: white;
+      text-align: right;
+      font-size: 0.95rem;
+      background: #6c757d;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .time-row-modal {
+      border-top: 2px solid #e9ecef !important;
+      padding-top: 16px !important;
+      margin-top: 8px;
+    }
+
+    .time-value-modal {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white !important;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    .time-value-modal.color-green {
+      background: #28a745;
+    }
+
+    .time-value-modal.color-yellow {
+      background: #ffc107;
+      color: #333 !important;
+    }
+
+    .time-value-modal.color-red {
+      background: #dc3545;
     }
 
     .row-content {
@@ -1070,6 +1309,43 @@ interface ApiOrderItem {
       .single-section .time-remaining {
         font-size: 0.65rem !important;
       }
+
+      /* Modal responsive untuk mobile portrait */
+      .order-modal {
+        width: 95%;
+        max-width: 350px;
+      }
+
+      .modal-header h3 {
+        font-size: 1.1rem;
+      }
+
+      .card-body-modal {
+        padding: 16px;
+      }
+
+      .info-row-modal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 8px 0;
+      }
+
+      .info-row-modal span {
+        text-align: left;
+        font-size: 0.9rem;
+        margin-top: 4px;
+        width: 100%;
+      }
+
+      .info-row-modal label {
+        font-size: 0.9rem;
+      }
+
+      .time-value-modal {
+        font-size: 1rem !important;
+        padding: 4px 8px !important;
+      }
     }
 
     /* Responsive untuk Mobile Kecil */
@@ -1152,6 +1428,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Tooltip visibility state
   activeTooltip: string | null = null;
+
+  // Order detail modal state
+  selectedOrder: ApiOrderItem | null = null;
+  isOrderModalOpen = false;
 
   constructor(
     private http: HttpClient,
@@ -1447,6 +1727,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return true;
     }
     
+    // Search berdasarkan PO Number
+    if (order.PONum && order.PONum.toLowerCase().includes(searchTerm)) {
+      return true;
+    }
+    
     return false;
   }
 
@@ -1530,6 +1815,43 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const displayed = this.getDisplayedOrdersByStatus(status);
     const total = this.getTotalOrdersByStatus(status);
     return `${displayed}/${total}`;
+  }
+
+  // Order modal methods
+  openOrderModal(order: ApiOrderItem, event: Event) {
+    event.stopPropagation();
+    this.selectedOrder = order;
+    this.isOrderModalOpen = true;
+  }
+
+  closeOrderModal() {
+    this.selectedOrder = null;
+    this.isOrderModalOpen = false;
+  }
+
+  getTimeRemainingForModal(order: ApiOrderItem): string {
+    if (!order.CreateDate) return 'No Date';
+    
+    const createDate = new Date(order.CreateDate);
+    const deadline = new Date(createDate.getTime() + (48 * 60 * 60 * 1000));
+    const diffMs = deadline.getTime() - this.currentTime.getTime();
+    
+    const absDiffMs = Math.abs(diffMs);
+    const days = Math.floor(absDiffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((absDiffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((absDiffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((absDiffMs % (1000 * 60)) / 1000);
+    
+    const daysStr = days.toString().padStart(2, '0');
+    const hoursStr = hours.toString().padStart(2, '0');
+    const minutesStr = minutes.toString().padStart(2, '0');
+    const secondsStr = seconds.toString().padStart(2, '0');
+    
+    if (diffMs <= 0) {
+      return `OVERDUE ${daysStr}:${hoursStr}:${minutesStr}:${secondsStr}`;
+    } else {
+      return `${daysStr}:${hoursStr}:${minutesStr}:${secondsStr}`;
+    }
   }
 
   openStatusDetail(status: string) {
