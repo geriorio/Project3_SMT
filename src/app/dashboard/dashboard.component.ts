@@ -21,6 +21,7 @@ interface ApiOrderItem {
   OrderDate: string;
   NeedByDate: string;
   Status: string;
+  PONum: string;
 }
 
 @Component({
@@ -121,6 +122,7 @@ interface ApiOrderItem {
                   <div class="header-content">
                     <span class="section-title">
                       {{ section }}
+                      <span class="order-counter">{{ getOrderCountText(section) }}</span>
                       <button 
                         class="info-button" 
                         (click)="showTooltip(section, $event)"
@@ -476,6 +478,18 @@ interface ApiOrderItem {
 
     .section-title .info-button {
       pointer-events: auto; /* Re-enable clicks for the button */
+    }
+
+    .order-counter {
+      font-size: 0.75rem;
+      color: #6c757d;
+      font-weight: 500;
+      margin-left: 8px;
+      background: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+      white-space: nowrap;
     }
 
     .info-button {
@@ -860,6 +874,12 @@ interface ApiOrderItem {
       .time-remaining {
         font-size: 0.65rem !important;
       }
+
+      .order-counter {
+        font-size: 0.7rem;
+        padding: 1px 5px;
+        margin-left: 6px;
+      }
     }
 
     /* Responsive untuk Mobile Landscape */
@@ -920,6 +940,12 @@ interface ApiOrderItem {
       .logout-btn {
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
+      }
+
+      .order-counter {
+        font-size: 0.65rem;
+        padding: 1px 4px;
+        margin-left: 5px;
       }
     }
 
@@ -983,6 +1009,12 @@ interface ApiOrderItem {
         font-size: 0.9rem;
         padding: 3px 6px;
         height: 32px;
+      }
+
+      .order-counter {
+        font-size: 0.65rem;
+        padding: 1px 4px;
+        margin-left: 6px;
       }
 
       .row-content {
@@ -1188,8 +1220,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   fetchOrders() {
     const url = 'https://epicprodapp.samator.com/Kinetic/api/v2/efx/SGI/FSMT069OrderDash/GetOrders';
-    const username = 'christo';
-    const password = 'Chr15topherb@';
+    const username = 'epicorWebAPI';
+    const password = 'epicorWebAPI';
     const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
     
     const headers = new HttpHeaders({
@@ -1480,6 +1512,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getSectionInfo(section: string): string {
     return this.sectionInfos[section as keyof typeof this.sectionInfos] || '';
+  }
+
+  getTotalOrdersByStatus(status: string): number {
+    return this.orders.filter(order => 
+      order.Status === status && 
+      this.isWithinDateFilter(order) && 
+      this.isWithinSearchFilter(order)
+    ).length;
+  }
+
+  getDisplayedOrdersByStatus(status: string): number {
+    return this.getLatestOrdersByStatus(status).length;
+  }
+
+  getOrderCountText(status: string): string {
+    const displayed = this.getDisplayedOrdersByStatus(status);
+    const total = this.getTotalOrdersByStatus(status);
+    return `${displayed}/${total}`;
   }
 
   openStatusDetail(status: string) {
