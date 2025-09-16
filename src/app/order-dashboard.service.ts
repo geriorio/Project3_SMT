@@ -6,10 +6,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class OrderDashboardService {
-  private apiUrl = 'https://epictestapp.samator.com/KineticTest2/api/v2/efx/SGI/FSMT069OrderDash/GetOrders';
-  private apiKey = 'MtW5QmpH660283OeMjCoRhgvZf2WBe1nbJMT3bTyJfuhB';
-  private username = 'christo';
-  private password = 'Chr15topherb@';
+  private apiUrl = 'https://epicprodapp.samator.com/Kinetic/api/v2/efx/SGI/FSMT069OrderDash/GetOrders';
+  private apiKey = 'W5hczOaOGdc68PcfchvZSvhUmWOf9AX3P6Zhfm0cghdPu';
+  private username = 'epicorWebAPI';
+  private password = 'epicorWebAPI';
 
   constructor(private http: HttpClient) {}
 

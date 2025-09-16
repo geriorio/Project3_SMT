@@ -574,8 +574,8 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
 
   fetchOrders() {
     const url = 'https://epicprodapp.samator.com/Kinetic/api/v2/efx/SGI/FSMT069OrderDash/GetOrders';
-    const username = 'christo';
-    const password = 'Chr15topherb@';
+    const username = 'epicorWebAPI';
+    const password = 'epicorWebAPI';
     const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
     
     const headers = new HttpHeaders({
