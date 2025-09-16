@@ -22,6 +22,7 @@ interface ApiOrderItem {
   OrderDate: string;
   NeedByDate: string;
   Status: string;
+  PONum: string;
 }
 
 @Component({
@@ -61,7 +62,7 @@ interface ApiOrderItem {
                 type="text"
                 [(ngModel)]="searchQuery"
                 (input)="onSearchChange()"
-                placeholder="Order Number, Customer ID or Name..."
+                placeholder="Order Number, Customer ID, Name or PO Number..."
                 class="search-input">
               @if (searchQuery) {
                 <button (click)="clearSearch()" class="clear-search-btn">×</button>
@@ -103,6 +104,10 @@ interface ApiOrderItem {
                     <div class="info-row">
                       <label>Name:</label>
                       <span>{{ order.Name }}</span>
+                    </div>
+                    <div class="info-row">
+                      <label>PO Number:</label>
+                      <span>{{ order.PONum || 'N/A' }}</span>
                     </div>
                     <div class="info-row">
                       <label>Created:</label>
@@ -562,7 +567,8 @@ export class StatusDetailComponent implements OnInit, OnDestroy {
     this.filteredOrders = this.orders.filter(order => 
       order.OrderNum.toString().includes(query) ||
       order.CustomerID.toLowerCase().includes(query) ||
-      order.Name.toLowerCase().includes(query)
+      order.Name.toLowerCase().includes(query) ||
+      (order.PONum && order.PONum.toLowerCase().includes(query))
     );
   }
 

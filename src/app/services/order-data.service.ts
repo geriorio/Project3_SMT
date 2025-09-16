@@ -9,6 +9,7 @@ interface ApiOrderItem {
   OrderDate: string;
   NeedByDate: string;
   Status: string;
+  PONum: string;
 }
 
 @Injectable({
